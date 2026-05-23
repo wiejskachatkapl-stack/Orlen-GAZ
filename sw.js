@@ -1,5 +1,5 @@
-const SW_VERSION = "ORLEN1013";
-const CACHE_NAME = "orlen-gaz-cache-ORLEN1013";
+const SW_VERSION = "ORLEN1014";
+const CACHE_NAME = "orlen-gaz-cache-ORLEN1014";
 const APP_SHELL = [
   "./",
   "./index.html",
