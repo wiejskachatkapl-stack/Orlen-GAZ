@@ -191,30 +191,22 @@
     }
     .preview-shell {
       background: linear-gradient(180deg, #fafdff 0%, #f1f7fe 100%);
-      border: 16px solid rgba(255,255,255,0.96);
-      border-radius: 18px;
+      border: 10px solid rgba(255,255,255,0.96);
+      border-radius: 22px;
       padding: 18px;
-      box-shadow: 0 18px 45px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.6);
+      box-shadow: 0 18px 45px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.6);
     }
     .sheet-frame {
       position: relative;
-      padding: 20px 18px;
-      border-radius: 18px;
-      background: #fff;
+      padding: 20px;
+      border-radius: 20px;
+      background: linear-gradient(180deg, #ffffff 0%, #f6fbff 100%);
       box-shadow: 0 10px 28px rgba(11,45,82,.08);
       overflow-x: auto;
+      border: 1px solid rgba(18,61,107,.08);
     }
     .sheet-frame::before {
-      content: "ORLEN GAZ";
-      position: absolute;
-      right: 18px;
-      top: 14px;
-      font-size: 46px;
-      font-weight: 800;
-      letter-spacing: 2px;
-      color: rgba(11,45,82,.05);
-      pointer-events: none;
-      user-select: none;
+      display: none;
     }
 
     .entry-panel {
@@ -341,23 +333,32 @@
       box-shadow: 0 2px 5px rgba(0,0,0,.15);
     }
     button:hover { filter: brightness(1.08); transform: translateY(-1px); }
+    
     table.sheet {
-      border-collapse: collapse;
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
       table-layout: fixed;
-      background: var(--sheet-bg);
+      background: linear-gradient(180deg, #f9fcff 0%, #f4f9ff 100%);
       margin: 0 auto;
+      border: 1px solid #d7e5f3;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 14px 34px rgba(11,45,82,.08);
     }
     .sheet td {
-      border: 1.4px solid var(--grid);
-      height: 31px;
-      min-height: 31px;
-      padding: 2px 6px;
+      border: 1px solid #d9e5f1;
+      height: 33px;
+      min-height: 33px;
+      padding: 4px 8px;
       text-align: center;
       vertical-align: middle;
       font-size: 15px;
       line-height: 1.15;
       white-space: nowrap;
       overflow: hidden;
+      color: #163a5c;
+      background: rgba(255,255,255,.82);
     }
     .sheet td span {
       display: inline-block;
@@ -365,52 +366,86 @@
       min-height: 20px;
       outline: none;
     }
+    .sheet tr.header-space td {
+      background: #f7fbff;
+      border-color: #e7f0f8;
+    }
+    .sheet tr.spacer-row td,
+    .sheet tr.pay-value-row td {
+      background: #f7fbff;
+      border-color: #e7f0f8;
+    }
     .sheet td.editable {
-      background: var(--editable-bg);
-      box-shadow: inset 0 0 0 1px rgba(244,177,131,.45);
+      background: linear-gradient(180deg, #ffffff 0%, #f9fcff 100%);
+      box-shadow: none;
     }
     .sheet td.editable span:focus {
       background: #ffffff;
       box-shadow: inset 0 0 0 2px #1f4e78;
-      border-radius: 3px;
+      border-radius: 6px;
     }
-
     .sheet td.formula {
-      background: #f8fbff;
-      font-weight: 600;
+      background: linear-gradient(180deg, #fbfdff 0%, #f0f7fe 100%);
+      font-weight: 700;
+    }
+    .sheet tr.service-row td {
+      background: rgba(255,255,255,.92);
+    }
+    .sheet tr.meter-row td {
+      background: linear-gradient(180deg, #fafdff 0%, #eef6fd 100%);
     }
     .sheet td.dark {
       background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-dark-2) 100%);
       color: white;
-      font-weight: 700;
+      font-weight: 800;
       font-size: 22px;
       letter-spacing: .4px;
+      border-color: #184772;
     }
     .sheet td.year {
       font-size: 30px;
-      font-weight: 700;
+      font-weight: 800;
     }
     .sheet td.month-center {
       color: var(--blue-dark);
       letter-spacing: .9px;
       font-size: 34px;
-      background: linear-gradient(180deg, #fafdff 0%, #dbeefe 100%);
+      background: linear-gradient(180deg, #ffffff 0%, #e5f1fc 100%);
       box-shadow: inset 0 0 0 2px rgba(18,61,107,.10);
+      border-color: #c8ddf0;
     }
     .sheet td.blue {
       background: linear-gradient(180deg, #d9ebfb 0%, #cfe4f8 100%);
       font-weight: 700;
     }
     .sheet td.red {
-      background: linear-gradient(180deg, #edf6ff 0%, #d7ecff 100%);
+      background: linear-gradient(180deg, #eef7ff 0%, #deefff 100%);
       color: var(--navy);
       font-weight: 800;
     }
     .sheet td.orange {
-      background: linear-gradient(180deg, #d6e9fb 0%, #b7d7f4 100%);
+      background: linear-gradient(180deg, #eef7ff 0%, #d9ebfd 100%);
       color: var(--navy);
       font-size: 30px;
+      font-weight: 800;
+    }
+    .sheet td.service-label {
+      text-align: left;
       font-weight: 700;
+      color: #123d6b;
+      background: linear-gradient(90deg, #eef6ff 0%, #ffffff 100%);
+    }
+    .sheet td.left-label {
+      text-align: left;
+      font-size: 20px;
+      font-weight: 800;
+      color: #0f3559;
+      background: linear-gradient(90deg, #e2f0ff 0%, #fafdff 100%);
+    }
+    .sheet td.line-amount {
+      background: linear-gradient(180deg, #f5fbff 0%, #e6f2fd 100%);
+      font-weight: 800;
+      color: #0e355c;
     }
     .sheet td.summary-head {
       background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-mid) 100%);
@@ -419,30 +454,32 @@
       font-size: 16px;
       text-transform: uppercase;
       letter-spacing: .3px;
+      border-color: #1c4f7e;
     }
     .sheet td.summary-value {
-      background: linear-gradient(180deg, #f4faff 0%, #dcebfb 100%);
+      background: linear-gradient(180deg, #ffffff 0%, #edf6ff 100%);
       color: var(--navy);
-      font-weight: 800;
+      font-weight: 900;
       font-size: 22px;
-      box-shadow: inset 0 0 0 2px rgba(18,61,107,.10);
+      box-shadow: inset 0 0 0 1px rgba(18,61,107,.08);
     }
     .sheet td.total-main {
-      background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-mid) 100%);
+      background: linear-gradient(135deg, #103863 0%, #1f5c93 100%);
       color: #fff;
       font-size: 28px;
       font-weight: 900;
-      box-shadow: inset 0 0 0 2px rgba(255,255,255,.10);
+      border-color: #1d4f7c;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.12);
     }
     .sheet td.side-result {
-      background: linear-gradient(180deg, #eaf4ff 0%, #d0e6fb 100%);
+      background: linear-gradient(180deg, #eef7ff 0%, #d8ecff 100%);
       color: var(--blue-dark);
       font-size: 24px;
       font-weight: 900;
-      box-shadow: inset 0 0 0 2px rgba(18,61,107,.10);
+      box-shadow: inset 0 0 0 1px rgba(18,61,107,.10);
     }
     .sheet td.result-strong {
-      background: linear-gradient(135deg, #c8e1fb 0%, #a6cef4 100%);
+      background: linear-gradient(135deg, #d8ecff 0%, #bddcf8 100%);
       color: #08203b;
     }
     .sheet td.pay-banner {
@@ -451,21 +488,18 @@
       font-size: 18px;
       font-weight: 900;
       letter-spacing: .5px;
+      border-color: #1d4f7c;
     }
     .sheet td.pay-amount {
-      background: linear-gradient(180deg, #f5fbff 0%, #d8ecff 100%);
+      background: linear-gradient(180deg, #ffffff 0%, #e5f1fc 100%);
       color: #08203b;
-      font-size: 42px;
+      font-size: 44px;
       font-weight: 900;
-      box-shadow: inset 0 0 0 3px rgba(11,45,82,.16);
+      box-shadow: inset 0 0 0 2px rgba(11,45,82,.12);
+      border-color: #c8ddf0;
     }
+    .sheet td.bold { font-weight: 800; }
 
-    .sheet td.left-label {
-      text-align: left;
-      font-size: 18px;
-      font-weight: 700;
-    }
-    .sheet td.bold { font-weight: 700; }
     .formula-bar {
       margin-top: 14px;
       font-size: 13px;
@@ -844,7 +878,7 @@
         <col style="width:173px"><col style="width:113px"><col style="width:128px"><col style="width:113px"><col style="width:105px"><col style="width:98px"><col style="width:105px"><col style="width:105px"><col style="width:105px"><col style="width:105px"><col style="width:113px"><col style="width:98px"><col style="width:113px">
       </colgroup>
       <tbody>
-        <tr><td data-cell="A1"><span></span></td><td data-cell="B1"><span></span></td><td data-cell="C1"><span></span></td><td data-cell="D1"><span></span></td><td data-cell="E1"><span></span></td><td data-cell="F1" colspan="3" class="editable dark"><span class="cell-input" contenteditable="true">KWIECIEŃ</span></td><td data-cell="I1"><span></span></td><td data-cell="J1"><span></span></td><td data-cell="K1"><span></span></td><td data-cell="L1"><span></span></td><td data-cell="M1"><span></span></td></tr><tr><td data-cell="A2"><span></span></td><td data-cell="B2"><span></span></td><td data-cell="C2"><span></span></td><td data-cell="D2"><span></span></td><td data-cell="E2"><span></span></td><td data-cell="F2" rowspan="2" colspan="3" class="editable year month-center"><span class="cell-input" contenteditable="true">KWIECIEŃ</span></td><td data-cell="I2"><span></span></td><td data-cell="J2"><span></span></td><td data-cell="K2"><span></span></td><td data-cell="L2"><span></span></td><td data-cell="M2"><span></span></td></tr><tr><td data-cell="A3"><span></span></td><td data-cell="B3"><span></span></td><td data-cell="C3"><span></span></td><td data-cell="D3"><span></span></td><td data-cell="E3"><span></span></td><td data-cell="I3"><span></span></td><td data-cell="J3"><span></span></td><td data-cell="K3"><span></span></td><td data-cell="L3"><span></span></td><td data-cell="M3"><span></span></td></tr><tr><td data-cell="A4" class="editable"><span class="cell-input" contenteditable="true">Opłata abonamentowa</span></td><td data-cell="B4"><span></span></td><td data-cell="C4" class="editable"><span class="cell-input" contenteditable="true">W-3.12T</span></td><td data-cell="D4" class="editable"><span class="cell-input" contenteditable="true">01.04.26</span></td><td data-cell="E4" class="editable"><span class="cell-input" contenteditable="true">30.04.26</span></td><td data-cell="F4"><span></span></td><td data-cell="G4"><span></span></td><td data-cell="H4"><span></span></td><td data-cell="I4" class="editable"><span class="cell-input" contenteditable="true">1 mc</span></td><td data-cell="J4"><span></span></td><td data-cell="K4" class="editable"><span class="cell-input" contenteditable="true">1 mc</span></td><td data-cell="L4" class="editable"><span class="cell-input" contenteditable="true">10,02</span></td><td data-cell="M4" class="editable"><span class="cell-input" contenteditable="true">10,02</span></td></tr><tr><td data-cell="A5" class="editable"><span class="cell-input" contenteditable="true">Paliwo gazowe</span></td><td data-cell="B5" class="editable"><span class="cell-input" contenteditable="true">G1</span></td><td data-cell="C5" class="editable"><span class="cell-input" contenteditable="true">W-3.12T</span></td><td data-cell="D5" class="formula" data-formula="=D4"><span>01.04.26</span></td><td data-cell="E5" class="formula" data-formula="=E4"><span>30.04.26</span></td><td data-cell="F5" class="editable"><span class="cell-input" contenteditable="true">1714</span></td><td data-cell="G5" class="editable"><span class="cell-input" contenteditable="true">1864</span></td><td data-cell="H5" class="formula bold" data-formula="=SUM(G5-F5)"><span>150</span></td><td data-cell="I5"><span></span></td><td data-cell="J5" class="editable"><span class="cell-input" contenteditable="true">11,719</span></td><td data-cell="K5" class="editable"><span class="cell-input" contenteditable="true">2273 kWh</span></td><td data-cell="L5" class="editable"><span class="cell-input" contenteditable="true">0,20426</span></td><td data-cell="M5" class="formula" data-formula="=SUM(L5*H5*J5)"><span>359,06</span></td></tr><tr><td data-cell="A6" class="editable"><span class="cell-input" contenteditable="true">Dystrybucja stała</span></td><td data-cell="B6"><span></span></td><td data-cell="C6" class="editable"><span class="cell-input" contenteditable="true">W-3.6WA</span></td><td data-cell="D6" class="formula" data-formula="=D4"><span>01.04.26</span></td><td data-cell="E6" class="formula" data-formula="=E4"><span>30.04.26</span></td><td data-cell="F6"><span></span></td><td data-cell="G6"><span></span></td><td data-cell="H6"><span></span></td><td data-cell="I6" class="editable"><span class="cell-input" contenteditable="true">1 mc</span></td><td data-cell="J6"><span></span></td><td data-cell="K6" class="editable"><span class="cell-input" contenteditable="true">1 mc</span></td><td data-cell="L6" class="editable"><span class="cell-input" contenteditable="true">63,57</span></td><td data-cell="M6" class="editable"><span class="cell-input" contenteditable="true">63,57</span></td></tr><tr><td data-cell="A7" class="editable"><span class="cell-input" contenteditable="true">Dystrybucja zmienna</span></td><td data-cell="B7" class="editable"><span class="cell-input" contenteditable="true">G1</span></td><td data-cell="C7" class="editable"><span class="cell-input" contenteditable="true">W-3.6WA</span></td><td data-cell="D7" class="formula" data-formula="=D4"><span>01.04.26</span></td><td data-cell="E7" class="formula" data-formula="=E4"><span>30.04.26</span></td><td data-cell="F7" class="editable"><span class="cell-input" contenteditable="true">1714</span></td><td data-cell="G7" class="editable"><span class="cell-input" contenteditable="true">1864</span></td><td data-cell="H7" class="formula bold" data-formula="=SUM(G7-F7)"><span>150</span></td><td data-cell="I7"><span></span></td><td data-cell="J7" class="formula" data-formula="=J5"><span>11,719</span></td><td data-cell="K7" class="editable"><span class="cell-input" contenteditable="true">2273 kWh</span></td><td data-cell="L7" class="editable"><span class="cell-input" contenteditable="true">0,03919</span></td><td data-cell="M7" class="formula" data-formula="=SUM(L7*J7*H7)"><span>68,89</span></td></tr><tr><td data-cell="A8" class="editable left-label"><span class="cell-input" contenteditable="true">Licznik góra</span></td><td data-cell="B8"><span></span></td><td data-cell="C8"><span></span></td><td data-cell="D8" class="formula" data-formula="=D4"><span>01.04.26</span></td><td data-cell="E8" class="formula" data-formula="=E4"><span>30.04.26</span></td><td data-cell="F8" class="editable"><span class="cell-input" contenteditable="true">43606</span></td><td data-cell="G8" class="editable"><span class="cell-input" contenteditable="true">43665</span></td><td data-cell="H8" class="formula bold" data-formula="=G8-F8"><span>59</span></td><td data-cell="I8" class="formula bold" data-formula="=(M12/H5)"><span>4,31</span></td><td data-cell="J8"><span></span></td><td data-cell="K8"><span></span></td><td data-cell="L8"><span></span></td><td data-cell="M8" class="formula red side-result" data-formula="=(H8*I8)"><span>254,00</span></td></tr><tr><td data-cell="A9" class="editable left-label"><span class="cell-input" contenteditable="true">Licznik dół</span></td><td data-cell="B9"><span></span></td><td data-cell="C9"><span></span></td><td data-cell="D9" class="formula" data-formula="=D4"><span>01.04.26</span></td><td data-cell="E9" class="formula" data-formula="=E4"><span>30.04.26</span></td><td data-cell="F9"><span></span></td><td data-cell="G9"><span></span></td><td data-cell="H9" class="formula bold" data-formula="=(H5-H8)"><span>91</span></td><td data-cell="I9" class="formula bold" data-formula="=I8"><span>4,31</span></td><td data-cell="J9"><span></span></td><td data-cell="K9"><span></span></td><td data-cell="L9"><span></span></td><td data-cell="M9" class="formula red side-result result-strong" data-formula="=(I9*H9)"><span>391,77</span></td></tr><tr><td data-cell="A10"><span></span></td><td data-cell="B10"><span></span></td><td data-cell="C10"><span></span></td><td data-cell="D10"><span></span></td><td data-cell="E10"><span></span></td><td data-cell="F10"><span></span></td><td data-cell="G10"><span></span></td><td data-cell="H10"><span></span></td><td data-cell="I10"><span></span></td><td data-cell="J10"><span></span></td><td data-cell="K10"><span></span></td><td data-cell="L10"><span></span></td><td data-cell="M10"><span></span></td></tr><tr><td data-cell="A11"><span></span></td><td data-cell="B11"><span></span></td><td data-cell="C11"><span></span></td><td data-cell="D11"><span></span></td><td data-cell="E11"><span></span></td><td data-cell="F11"><span></span></td><td data-cell="G11"><span></span></td><td data-cell="H11"><span></span></td><td data-cell="I11"><span></span></td><td data-cell="J11"><span></span></td><td data-cell="K11" class="blue summary-head"><span>Wartość:</span></td><td data-cell="L11" class="blue summary-head"><span>VAT</span></td><td data-cell="M11" class="blue summary-head"><span>brutto [zł]</span></td></tr><tr><td data-cell="A12"><span></span></td><td data-cell="B12"><span></span></td><td data-cell="C12"><span></span></td><td data-cell="D12"><span></span></td><td data-cell="E12"><span></span></td><td data-cell="F12"><span></span></td><td data-cell="G12"><span></span></td><td data-cell="H12"><span></span></td><td data-cell="I12"><span></span></td><td data-cell="J12"><span></span></td><td data-cell="K12" class="formula summary-value"><span>501,54</span></td><td data-cell="L12" class="editable summary-value"><span class="cell-input" contenteditable="true">144,23</span></td><td data-cell="M12" class="formula red total-main" data-formula="=SUM(K12+L12)"><span>645,77</span></td></tr><tr><td data-cell="A13" colspan="13" class="dark pay-banner"><span>DO ZAPŁATY LICZNIK DÓŁ ZA MIESIĄC</span></td></tr><tr><td data-cell="A14"><span></span></td><td data-cell="B14"><span></span></td><td data-cell="C14"><span></span></td><td data-cell="D14"><span></span></td><td data-cell="E14"><span></span></td><td data-cell="F14" rowspan="2" colspan="3" class="formula orange pay-amount" data-formula="=M9"><span>391,77</span></td><td data-cell="I14"><span></span></td><td data-cell="J14"><span></span></td><td data-cell="K14"><span></span></td><td data-cell="L14"><span></span></td><td data-cell="M14"><span></span></td></tr><tr><td data-cell="A15"><span></span></td><td data-cell="B15"><span></span></td><td data-cell="C15"><span></span></td><td data-cell="D15"><span></span></td><td data-cell="E15"><span></span></td><td data-cell="I15"><span></span></td><td data-cell="J15"><span></span></td><td data-cell="K15"><span></span></td><td data-cell="L15"><span></span></td><td data-cell="M15"><span></span></td></tr>
+        <tr class="header-space"><td data-cell="A1"><span></span></td><td data-cell="B1"><span></span></td><td data-cell="C1"><span></span></td><td data-cell="D1"><span></span></td><td data-cell="E1"><span></span></td><td data-cell="F1" colspan="3" class="editable dark"><span class="cell-input" contenteditable="true">KWIECIEŃ</span></td><td data-cell="I1"><span></span></td><td data-cell="J1"><span></span></td><td data-cell="K1"><span></span></td><td data-cell="L1"><span></span></td><td data-cell="M1"><span></span></td></tr><tr class="header-space"><td data-cell="A2"><span></span></td><td data-cell="B2"><span></span></td><td data-cell="C2"><span></span></td><td data-cell="D2"><span></span></td><td data-cell="E2"><span></span></td><td data-cell="F2" rowspan="2" colspan="3" class="editable year month-center"><span class="cell-input" contenteditable="true">KWIECIEŃ</span></td><td data-cell="I2"><span></span></td><td data-cell="J2"><span></span></td><td data-cell="K2"><span></span></td><td data-cell="L2"><span></span></td><td data-cell="M2"><span></span></td></tr><tr class="header-space"><td data-cell="A3"><span></span></td><td data-cell="B3"><span></span></td><td data-cell="C3"><span></span></td><td data-cell="D3"><span></span></td><td data-cell="E3"><span></span></td><td data-cell="I3"><span></span></td><td data-cell="J3"><span></span></td><td data-cell="K3"><span></span></td><td data-cell="L3"><span></span></td><td data-cell="M3"><span></span></td></tr><tr class="service-row"><td data-cell="A4" class="editable service-label"><span class="cell-input" contenteditable="true">Opłata abonamentowa</span></td><td data-cell="B4"><span></span></td><td data-cell="C4" class="editable"><span class="cell-input" contenteditable="true">W-3.12T</span></td><td data-cell="D4" class="editable"><span class="cell-input" contenteditable="true">01.04.26</span></td><td data-cell="E4" class="editable"><span class="cell-input" contenteditable="true">30.04.26</span></td><td data-cell="F4"><span></span></td><td data-cell="G4"><span></span></td><td data-cell="H4"><span></span></td><td data-cell="I4" class="editable"><span class="cell-input" contenteditable="true">1 mc</span></td><td data-cell="J4"><span></span></td><td data-cell="K4" class="editable"><span class="cell-input" contenteditable="true">1 mc</span></td><td data-cell="L4" class="editable"><span class="cell-input" contenteditable="true">10,02</span></td><td data-cell="M4" class="editable"><span class="cell-input" contenteditable="true">10,02</span></td></tr><tr class="service-row"><td data-cell="A5" class="editable service-label"><span class="cell-input" contenteditable="true">Paliwo gazowe</span></td><td data-cell="B5" class="editable"><span class="cell-input" contenteditable="true">G1</span></td><td data-cell="C5" class="editable"><span class="cell-input" contenteditable="true">W-3.12T</span></td><td data-cell="D5" class="formula" data-formula="=D4"><span>01.04.26</span></td><td data-cell="E5" class="formula" data-formula="=E4"><span>30.04.26</span></td><td data-cell="F5" class="editable"><span class="cell-input" contenteditable="true">1714</span></td><td data-cell="G5" class="editable"><span class="cell-input" contenteditable="true">1864</span></td><td data-cell="H5" class="formula bold" data-formula="=SUM(G5-F5)"><span>150</span></td><td data-cell="I5"><span></span></td><td data-cell="J5" class="editable"><span class="cell-input" contenteditable="true">11,719</span></td><td data-cell="K5" class="editable"><span class="cell-input" contenteditable="true">2273 kWh</span></td><td data-cell="L5" class="editable"><span class="cell-input" contenteditable="true">0,20426</span></td><td data-cell="M5" class="formula line-amount" data-formula="=SUM(L5*H5*J5)"><span>359,06</span></td></tr><tr class="service-row"><td data-cell="A6" class="editable service-label"><span class="cell-input" contenteditable="true">Dystrybucja stała</span></td><td data-cell="B6"><span></span></td><td data-cell="C6" class="editable"><span class="cell-input" contenteditable="true">W-3.6WA</span></td><td data-cell="D6" class="formula" data-formula="=D4"><span>01.04.26</span></td><td data-cell="E6" class="formula" data-formula="=E4"><span>30.04.26</span></td><td data-cell="F6"><span></span></td><td data-cell="G6"><span></span></td><td data-cell="H6"><span></span></td><td data-cell="I6" class="editable"><span class="cell-input" contenteditable="true">1 mc</span></td><td data-cell="J6"><span></span></td><td data-cell="K6" class="editable"><span class="cell-input" contenteditable="true">1 mc</span></td><td data-cell="L6" class="editable"><span class="cell-input" contenteditable="true">63,57</span></td><td data-cell="M6" class="editable line-amount"><span class="cell-input" contenteditable="true">63,57</span></td></tr><tr class="service-row"><td data-cell="A7" class="editable service-label"><span class="cell-input" contenteditable="true">Dystrybucja zmienna</span></td><td data-cell="B7" class="editable"><span class="cell-input" contenteditable="true">G1</span></td><td data-cell="C7" class="editable"><span class="cell-input" contenteditable="true">W-3.6WA</span></td><td data-cell="D7" class="formula" data-formula="=D4"><span>01.04.26</span></td><td data-cell="E7" class="formula" data-formula="=E4"><span>30.04.26</span></td><td data-cell="F7" class="editable"><span class="cell-input" contenteditable="true">1714</span></td><td data-cell="G7" class="editable"><span class="cell-input" contenteditable="true">1864</span></td><td data-cell="H7" class="formula bold" data-formula="=SUM(G7-F7)"><span>150</span></td><td data-cell="I7"><span></span></td><td data-cell="J7" class="formula" data-formula="=J5"><span>11,719</span></td><td data-cell="K7" class="editable"><span class="cell-input" contenteditable="true">2273 kWh</span></td><td data-cell="L7" class="editable"><span class="cell-input" contenteditable="true">0,03919</span></td><td data-cell="M7" class="formula line-amount" data-formula="=SUM(L7*J7*H7)"><span>68,89</span></td></tr><tr class="meter-row"><td data-cell="A8" class="editable left-label"><span class="cell-input" contenteditable="true">Licznik góra</span></td><td data-cell="B8"><span></span></td><td data-cell="C8"><span></span></td><td data-cell="D8" class="formula" data-formula="=D4"><span>01.04.26</span></td><td data-cell="E8" class="formula" data-formula="=E4"><span>30.04.26</span></td><td data-cell="F8" class="editable"><span class="cell-input" contenteditable="true">43606</span></td><td data-cell="G8" class="editable"><span class="cell-input" contenteditable="true">43665</span></td><td data-cell="H8" class="formula bold" data-formula="=G8-F8"><span>59</span></td><td data-cell="I8" class="formula bold" data-formula="=(M12/H5)"><span>4,31</span></td><td data-cell="J8"><span></span></td><td data-cell="K8"><span></span></td><td data-cell="L8"><span></span></td><td data-cell="M8" class="formula red side-result" data-formula="=(H8*I8)"><span>254,00</span></td></tr><tr class="meter-row"><td data-cell="A9" class="editable left-label"><span class="cell-input" contenteditable="true">Licznik dół</span></td><td data-cell="B9"><span></span></td><td data-cell="C9"><span></span></td><td data-cell="D9" class="formula" data-formula="=D4"><span>01.04.26</span></td><td data-cell="E9" class="formula" data-formula="=E4"><span>30.04.26</span></td><td data-cell="F9"><span></span></td><td data-cell="G9"><span></span></td><td data-cell="H9" class="formula bold" data-formula="=(H5-H8)"><span>91</span></td><td data-cell="I9" class="formula bold" data-formula="=I8"><span>4,31</span></td><td data-cell="J9"><span></span></td><td data-cell="K9"><span></span></td><td data-cell="L9"><span></span></td><td data-cell="M9" class="formula red side-result result-strong" data-formula="=(I9*H9)"><span>391,77</span></td></tr><tr class="spacer-row"><td data-cell="A10"><span></span></td><td data-cell="B10"><span></span></td><td data-cell="C10"><span></span></td><td data-cell="D10"><span></span></td><td data-cell="E10"><span></span></td><td data-cell="F10"><span></span></td><td data-cell="G10"><span></span></td><td data-cell="H10"><span></span></td><td data-cell="I10"><span></span></td><td data-cell="J10"><span></span></td><td data-cell="K10"><span></span></td><td data-cell="L10"><span></span></td><td data-cell="M10"><span></span></td></tr><tr class="summary-row"><td data-cell="A11"><span></span></td><td data-cell="B11"><span></span></td><td data-cell="C11"><span></span></td><td data-cell="D11"><span></span></td><td data-cell="E11"><span></span></td><td data-cell="F11"><span></span></td><td data-cell="G11"><span></span></td><td data-cell="H11"><span></span></td><td data-cell="I11"><span></span></td><td data-cell="J11"><span></span></td><td data-cell="K11" class="blue summary-head"><span>Wartość:</span></td><td data-cell="L11" class="blue summary-head"><span>VAT</span></td><td data-cell="M11" class="blue summary-head"><span>brutto [zł]</span></td></tr><tr class="summary-values-row"><td data-cell="A12"><span></span></td><td data-cell="B12"><span></span></td><td data-cell="C12"><span></span></td><td data-cell="D12"><span></span></td><td data-cell="E12"><span></span></td><td data-cell="F12"><span></span></td><td data-cell="G12"><span></span></td><td data-cell="H12"><span></span></td><td data-cell="I12"><span></span></td><td data-cell="J12"><span></span></td><td data-cell="K12" class="formula summary-value"><span>501,54</span></td><td data-cell="L12" class="editable summary-value"><span class="cell-input" contenteditable="true">144,23</span></td><td data-cell="M12" class="formula red total-main" data-formula="=SUM(K12+L12)"><span>645,77</span></td></tr><tr class="pay-banner-row"><td data-cell="A13" colspan="13" class="dark pay-banner"><span>DO ZAPŁATY LICZNIK DÓŁ ZA MIESIĄC</span></td></tr><tr class="pay-value-row"><td data-cell="A14"><span></span></td><td data-cell="B14"><span></span></td><td data-cell="C14"><span></span></td><td data-cell="D14"><span></span></td><td data-cell="E14"><span></span></td><td data-cell="F14" rowspan="2" colspan="3" class="formula orange pay-amount" data-formula="=M9"><span>391,77</span></td><td data-cell="I14"><span></span></td><td data-cell="J14"><span></span></td><td data-cell="K14"><span></span></td><td data-cell="L14"><span></span></td><td data-cell="M14"><span></span></td></tr><tr class="pay-value-row"><td data-cell="A15"><span></span></td><td data-cell="B15"><span></span></td><td data-cell="C15"><span></span></td><td data-cell="D15"><span></span></td><td data-cell="E15"><span></span></td><td data-cell="I15"><span></span></td><td data-cell="J15"><span></span></td><td data-cell="K15"><span></span></td><td data-cell="L15"><span></span></td><td data-cell="M15"><span></span></td></tr>
       </tbody>
     </table>
     </div>
@@ -911,7 +945,7 @@
     </section>
   </div>
 
-  <div class="app-version" id="appVersion">ORLEN1012</div>
+  <div class="app-version" id="appVersion">ORLEN1013</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -920,7 +954,7 @@
   <div class="update-success-toast" id="updateSuccessToast">Uaktualniono do najnowszej wersji</div>
 
   <script>
-    const APP_VERSION = "ORLEN1012";
+    const APP_VERSION = "ORLEN1013";
 
     function normText(s) {
       return (s ?? "").toString().trim();
