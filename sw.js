@@ -1,4 +1,4 @@
-const CACHE_NAME = "orlen-gaz-cache-v1001";
+const CACHE_NAME = "orlen-gaz-cache-ORLEN1004";
 const APP_SHELL = [
   "./",
   "./index.html",
