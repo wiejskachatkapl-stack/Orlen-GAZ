@@ -646,7 +646,6 @@
       }
     }
 
-
     .app-version {
       position: fixed;
       right: 10px;
@@ -685,7 +684,6 @@
       border-radius: 10px;
     }
 
-
     .exit-message {
       display: none;
       margin-top: 10px;
@@ -700,7 +698,6 @@
     button.exit-btn {
       background: linear-gradient(135deg, #7a0f0f 0%, #c01d1d 100%);
     }
-
 
     .update-success-toast {
       display: none;
@@ -909,7 +906,7 @@
     </section>
   </div>
 
-  <div class="app-version" id="appVersion">ORLEN1009</div>
+  <div class="app-version" id="appVersion">ORLEN1010</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -918,7 +915,7 @@
   <div class="update-success-toast" id="updateSuccessToast">Uaktualniono do najnowszej wersji</div>
 
   <script>
-    const APP_VERSION = "ORLEN1009";
+    const APP_VERSION = "ORLEN1010";
 
     function normText(s) {
       return (s ?? "").toString().trim();
@@ -1017,10 +1014,7 @@
       updateMobileView();
     }
 
-
     function setCellEditableState(enabled) {
-  
-
 
     function checkVersionMarker() {
       const last = localStorage.getItem("orlenLastVersion");
@@ -1099,7 +1093,6 @@
       });
     }
 
-
     function setMobile(key, value, suffix = "") {
       document.querySelectorAll(`[data-mobile="${key}"]`).forEach(el => {
         el.textContent = `${value ?? ""}${suffix}`;
@@ -1161,8 +1154,6 @@
       if (Number.isNaN(d.getTime())) return getRaw("F2") || "";
       return String(d.getFullYear());
     }
-
-
 
     function exitApplication() {
       try {
