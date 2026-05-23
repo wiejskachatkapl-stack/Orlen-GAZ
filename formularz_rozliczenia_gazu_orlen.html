@@ -703,19 +703,25 @@
       display: none;
       position: fixed;
       left: 50%;
-      top: 18px;
-      transform: translateX(-50%);
+      top: 50%;
+      transform: translate(-50%, -50%);
       z-index: 10001;
+      min-width: 260px;
       max-width: calc(100vw - 24px);
       background: #ffffff;
       color: #0b2d52;
       border: 2px solid #1f5c93;
       border-radius: 14px;
-      padding: 12px 16px;
+      padding: 14px 18px;
       box-shadow: 0 12px 30px rgba(0,0,0,.24);
       font-size: 15px;
       font-weight: 800;
       text-align: center;
+    }
+
+
+    .entry-panel > p {
+      display: none !important;
     }
 
     @media print {
@@ -905,7 +911,7 @@
     </section>
   </div>
 
-  <div class="app-version" id="appVersion">ORLEN1011</div>
+  <div class="app-version" id="appVersion">ORLEN1012</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -914,7 +920,7 @@
   <div class="update-success-toast" id="updateSuccessToast">Uaktualniono do najnowszej wersji</div>
 
   <script>
-    const APP_VERSION = "ORLEN1011";
+    const APP_VERSION = "ORLEN1012";
 
     function normText(s) {
       return (s ?? "").toString().trim();
@@ -1023,16 +1029,29 @@
     }
 
     function showUpdateSuccessIfNeeded() {
-      if (localStorage.getItem("orlenUpdateDone") !== "1") return;
+      const ls = localStorage.getItem("orlenUpdateDone") === "1";
+      const ss = sessionStorage.getItem("orlenUpdateDone") === "1";
+      const qs = new URLSearchParams(window.location.search).get("updated") === "1";
+
+      if (!(ls || ss || qs)) return;
 
       localStorage.removeItem("orlenUpdateDone");
+      sessionStorage.removeItem("orlenUpdateDone");
+
+      const params = new URLSearchParams(window.location.search);
+      if (params.has("updated")) {
+        params.delete("updated");
+        const q = params.toString();
+        history.replaceState({}, "", window.location.pathname + (q ? "?" + q : ""));
+      }
+
       const toast = document.getElementById("updateSuccessToast");
       if (!toast) return;
 
       toast.style.display = "block";
       window.setTimeout(() => {
         toast.style.display = "none";
-      }, 2600);
+      }, 2000);
     }
 
     function registerAutoUpdate() {
@@ -1061,6 +1080,7 @@
 
     document.getElementById("reloadUpdateBtn")?.addEventListener("click", async () => {
       localStorage.setItem("orlenUpdateDone", "1");
+      sessionStorage.setItem("orlenUpdateDone", "1");
 
       if ("caches" in window) {
         const keys = await caches.keys();
@@ -1071,7 +1091,7 @@
         navigator.serviceWorker.controller.postMessage({ type: "SKIP_WAITING" });
       }
 
-      window.location.href = window.location.pathname + "?v=" + APP_VERSION + "&t=" + Date.now();
+      window.location.href = window.location.pathname + "?updated=1&v=" + APP_VERSION + "&t=" + Date.now();
     });
 
     document.getElementById("closeUpdateBtn")?.addEventListener("click", () => {
@@ -1082,7 +1102,8 @@
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.addEventListener("controllerchange", () => {
         localStorage.setItem("orlenUpdateDone", "1");
-        window.location.reload();
+        sessionStorage.setItem("orlenUpdateDone", "1");
+        window.location.href = window.location.pathname + "?updated=1&v=" + APP_VERSION + "&t=" + Date.now();
       });
     }
 
