@@ -621,6 +621,26 @@
       background: linear-gradient(135deg, #7a0f0f 0%, #c01d1d 100%);
     }
 
+
+    .update-success-toast {
+      display: none;
+      position: fixed;
+      left: 50%;
+      top: 18px;
+      transform: translateX(-50%);
+      z-index: 10001;
+      max-width: calc(100vw - 24px);
+      background: #ffffff;
+      color: #0b2d52;
+      border: 2px solid #1f5c93;
+      border-radius: 14px;
+      padding: 12px 16px;
+      box-shadow: 0 12px 30px rgba(0,0,0,.24);
+      font-size: 15px;
+      font-weight: 800;
+      text-align: center;
+    }
+
     @media print {
       body { background: #fff; padding: 0; }
       .wrap { box-shadow: none; border-radius: 0; padding: 0; }
@@ -809,15 +829,16 @@
     </section>
   </div>
 
-  <div class="app-version" id="appVersion">ORLEN1006</div>
+  <div class="app-version" id="appVersion">ORLEN1007</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
     <button type="button" id="closeUpdateBtn">Zamknij</button>
   </div>
+  <div class="update-success-toast" id="updateSuccessToast">Uaktualniono do najnowszej wersji</div>
 
   <script>
-    const APP_VERSION = "ORLEN1006";
+    const APP_VERSION = "ORLEN1007";
 
     function normText(s) {
       return (s ?? "").toString().trim();
@@ -919,6 +940,20 @@
 
     function setCellEditableState(enabled) {
   
+
+    function showUpdateSuccessIfNeeded() {
+      if (localStorage.getItem("orlenUpdateDone") !== "1") return;
+
+      localStorage.removeItem("orlenUpdateDone");
+      const toast = document.getElementById("updateSuccessToast");
+      if (!toast) return;
+
+      toast.style.display = "block";
+      window.setTimeout(() => {
+        toast.style.display = "none";
+      }, 2600);
+    }
+
     function registerAutoUpdate() {
       if (!("serviceWorker" in navigator)) return;
 
@@ -944,6 +979,7 @@
     }
 
     document.getElementById("reloadUpdateBtn")?.addEventListener("click", () => {
+      localStorage.setItem("orlenUpdateDone", "1");
       if (navigator.serviceWorker.controller) {
         navigator.serviceWorker.controller.postMessage({ type: "SKIP_WAITING" });
       }
@@ -957,6 +993,7 @@
 
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.addEventListener("controllerchange", () => {
+        localStorage.setItem("orlenUpdateDone", "1");
         window.location.reload();
       });
     }
@@ -1149,6 +1186,7 @@
     });
     setCellEditableState(false);
     recalc();
+    showUpdateSuccessIfNeeded();
     registerAutoUpdate();
   </script>
 </body>
