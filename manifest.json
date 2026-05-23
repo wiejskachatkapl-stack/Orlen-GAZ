@@ -1,0 +1,16 @@
+{
+  "name": "Rozliczenie gazu ORLEN",
+  "short_name": "ORLEN Gaz",
+  "start_url": "formularz_rozliczenia_gazu_orlen.html",
+  "display": "standalone",
+  "background_color": "#0b2d52",
+  "theme_color": "#0b2d52",
+  "icons": [
+    {
+      "src": "orlen_icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
