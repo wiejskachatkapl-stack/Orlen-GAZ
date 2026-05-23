@@ -692,6 +692,7 @@
         </div>
         <div class="rates-actions">
           <button type="button" id="updateRatesBtn">Uaktualnij</button>
+          <button type="button" id="closeRatesBtn">Zamknij</button>
           <span id="ratesUpdated" class="rates-ok">Wartości uaktualnione.</span>
         </div>
       </div>
@@ -790,7 +791,7 @@
     </section>
   </div>
 
-  <div class="app-version" id="appVersion">ORLEN1004</div>
+  <div class="app-version" id="appVersion">ORLEN1005</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -798,7 +799,7 @@
   </div>
 
   <script>
-    const APP_VERSION = "ORLEN1004";
+    const APP_VERSION = "ORLEN1005";
 
     function normText(s) {
       return (s ?? "").toString().trim();
@@ -1105,6 +1106,10 @@
       document.getElementById("ratesPanel").classList.toggle("open");
     });
     document.getElementById("updateRatesBtn").addEventListener("click", updateRatesFromPanel);
+    document.getElementById("closeRatesBtn")?.addEventListener("click", () => {
+      const panel = document.getElementById("ratesPanel");
+      if (panel) panel.classList.remove("open");
+    });
     setCellEditableState(false);
     recalc();
     registerAutoUpdate();
