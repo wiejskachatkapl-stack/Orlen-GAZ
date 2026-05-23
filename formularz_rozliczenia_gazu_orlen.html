@@ -794,6 +794,7 @@
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
+    <button type="button" id="closeUpdateBtn">Zamknij</button>
   </div>
 
   <script>
@@ -928,6 +929,11 @@
         navigator.serviceWorker.controller.postMessage({ type: "SKIP_WAITING" });
       }
       window.location.reload();
+    });
+
+    document.getElementById("closeUpdateBtn")?.addEventListener("click", () => {
+      const toast = document.getElementById("updateToast");
+      if (toast) toast.style.display = "none";
     });
 
     if ("serviceWorker" in navigator) {
