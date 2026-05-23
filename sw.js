@@ -1,4 +1,5 @@
-const CACHE_NAME = "orlen-gaz-cache-ORLEN1008";
+const SW_VERSION = "ORLEN1009";
+const CACHE_NAME = "orlen-gaz-cache-ORLEN1009";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -37,7 +38,7 @@ self.addEventListener("fetch", event => {
 
   if (request.mode === "navigate" || url.pathname.endsWith(".html") || url.pathname.endsWith("manifest.json")) {
     event.respondWith(
-      fetch(request, { cache: "no-store" })
+      fetch(request, { cache: "no-store", headers: { "Cache-Control": "no-cache" } })
         .then(response => {
           const copy = response.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(request, copy));

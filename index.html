@@ -909,7 +909,7 @@
     </section>
   </div>
 
-  <div class="app-version" id="appVersion">ORLEN1008</div>
+  <div class="app-version" id="appVersion">ORLEN1009</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -918,7 +918,7 @@
   <div class="update-success-toast" id="updateSuccessToast">Uaktualniono do najnowszej wersji</div>
 
   <script>
-    const APP_VERSION = "ORLEN1008";
+    const APP_VERSION = "ORLEN1009";
 
     function normText(s) {
       return (s ?? "").toString().trim();
@@ -1021,6 +1021,14 @@
     function setCellEditableState(enabled) {
   
 
+
+    function checkVersionMarker() {
+      const last = localStorage.getItem("orlenLastVersion");
+      if (last !== APP_VERSION) {
+        localStorage.setItem("orlenLastVersion", APP_VERSION);
+      }
+    }
+
     function showUpdateSuccessIfNeeded() {
       if (localStorage.getItem("orlenUpdateDone") !== "1") return;
 
@@ -1037,7 +1045,7 @@
     function registerAutoUpdate() {
       if (!("serviceWorker" in navigator)) return;
 
-      navigator.serviceWorker.register("./sw.js").then(reg => {
+      navigator.serviceWorker.register("./sw.js?v=ORLEN1009", { updateViaCache: "none" }).then(reg => {
         reg.update();
 
         setInterval(() => {
@@ -1058,12 +1066,19 @@
       }).catch(() => {});
     }
 
-    document.getElementById("reloadUpdateBtn")?.addEventListener("click", () => {
+    document.getElementById("reloadUpdateBtn")?.addEventListener("click", async () => {
       localStorage.setItem("orlenUpdateDone", "1");
+
+      if ("caches" in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map(key => caches.delete(key)));
+      }
+
       if (navigator.serviceWorker.controller) {
         navigator.serviceWorker.controller.postMessage({ type: "SKIP_WAITING" });
       }
-      window.location.reload();
+
+      window.location.href = window.location.pathname + "?v=" + APP_VERSION + "&t=" + Date.now();
     });
 
     document.getElementById("closeUpdateBtn")?.addEventListener("click", () => {
@@ -1266,6 +1281,7 @@
     });
     setCellEditableState(false);
     recalc();
+    checkVersionMarker();
     showUpdateSuccessIfNeeded();
     registerAutoUpdate();
   </script>
