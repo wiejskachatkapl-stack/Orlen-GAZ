@@ -605,6 +605,22 @@
       border-radius: 10px;
     }
 
+
+    .exit-message {
+      display: none;
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: #ffffff;
+      border: 1.5px solid #9eb9d8;
+      color: var(--blue-dark);
+      font-weight: 700;
+      font-size: 14px;
+    }
+    button.exit-btn {
+      background: linear-gradient(135deg, #7a0f0f 0%, #c01d1d 100%);
+    }
+
     @media print {
       body { background: #fff; padding: 0; }
       .wrap { box-shadow: none; border-radius: 0; padding: 0; }
@@ -663,7 +679,8 @@
       <div class="form-actions">
         <button type="button" id="addReadingBtn">Dodaj</button>
         <button type="button" id="changeRatesBtn">Zmień wartości</button>
-        <span id="formError" class="error">Uzupełnij poprawnie wszystkie pola. Stan końcowy nie może być mniejszy od początkowego.</span>
+                <button type="button" id="exitAppBtn" class="exit-btn">Koniec</button>
+<span id="formError" class="error">Uzupełnij poprawnie wszystkie pola. Stan końcowy nie może być mniejszy od początkowego.</span>
       </div>
 
       <div id="ratesPanel" class="rates-panel" aria-label="Zmiana wartości rozliczenia">
@@ -716,7 +733,8 @@
     <div class="toolbar">
       <div class="note"><b>Podgląd rozliczenia gazu.</b> Ten widok jest tylko do odczytu. Dane pochodzą z formularza początkowego, a wyniki/formuły są przeliczone automatycznie.</div>
       <button type="button" onclick="window.print()">Drukuj / zapisz PDF</button>
-    </div>
+      <button type="button" id="exitAppBtnPreview" class="exit-btn">Koniec</button>
+</div>
 
     <div class="sheet-frame">
     <table class="sheet" aria-label="Szablon rozliczenia gazu">
@@ -791,7 +809,7 @@
     </section>
   </div>
 
-  <div class="app-version" id="appVersion">ORLEN1005</div>
+  <div class="app-version" id="appVersion">ORLEN1006</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -799,7 +817,7 @@
   </div>
 
   <script>
-    const APP_VERSION = "ORLEN1005";
+    const APP_VERSION = "ORLEN1006";
 
     function normText(s) {
       return (s ?? "").toString().trim();
@@ -1013,6 +1031,23 @@
     }
 
 
+
+    function exitApplication() {
+      try {
+        window.close();
+      } catch (e) {}
+
+      window.setTimeout(() => {
+        if (history.length > 1) {
+          history.back();
+          return;
+        }
+
+        const msg = document.getElementById("exitMessage");
+        if (msg) msg.style.display = "block";
+      }, 250);
+    }
+
     function readRateField(id) {
       const el = document.getElementById(id);
       return el ? normText(el.value) : "";
@@ -1105,6 +1140,8 @@
     document.getElementById("changeRatesBtn").addEventListener("click", () => {
       document.getElementById("ratesPanel").classList.toggle("open");
     });
+    document.getElementById("exitAppBtn")?.addEventListener("click", exitApplication);
+    document.getElementById("exitAppBtnPreview")?.addEventListener("click", exitApplication);
     document.getElementById("updateRatesBtn").addEventListener("click", updateRatesFromPanel);
     document.getElementById("closeRatesBtn")?.addEventListener("click", () => {
       const panel = document.getElementById("ratesPanel");
