@@ -1,1 +1,0 @@
-# Orlen-GAZ
