@@ -1584,7 +1584,7 @@
     </div>
   </section>
 
-  <div class="app-version" id="appVersion">ORLEN1034</div>
+  <div class="app-version" id="appVersion">ORLEN1035</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -1593,7 +1593,7 @@
   <div class="update-success-toast" id="updateSuccessToast">Uaktualniono do najnowszej wersji</div>
 
   <script>
-    const APP_VERSION = "ORLEN1034";
+    const APP_VERSION = "ORLEN1035";
 
     function normText(s) {
       return (s ?? "").toString().trim();
@@ -2355,12 +2355,13 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
 </body>
 </html>`;
     }
+
+
     function prepareAndPrintReport() {
       updatePrintReport();
       window.setTimeout(() => {
         window.print();
       }, 150);
-    }, 250);
     }, 150);
     }
 
