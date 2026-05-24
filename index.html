@@ -934,19 +934,23 @@
 
     
     
+    
     @page {
       size: A4 landscape;
       margin: 4mm;
     }
 
     @media print {
-      html, body {
-        width: auto !important;
-        height: auto !important;
+      html,
+      body {
         margin: 0 !important;
         padding: 0 !important;
+        width: 289mm !important;
+        min-width: 289mm !important;
+        max-width: 289mm !important;
+        height: 202mm !important;
         background: #ffffff !important;
-        overflow: visible !important;
+        overflow: hidden !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
@@ -955,14 +959,8 @@
         zoom: 1 !important;
       }
 
-      .wrap {
-        width: 100% !important;
-        max-width: none !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        box-shadow: none !important;
-        border-radius: 0 !important;
-        background: #ffffff !important;
+      * {
+        box-sizing: border-box !important;
       }
 
       #entryPanel,
@@ -976,47 +974,97 @@
         display: none !important;
       }
 
-      #previewArea {
-        display: block !important;
-        width: 100% !important;
+      .wrap {
+        width: 289mm !important;
+        min-width: 289mm !important;
+        max-width: 289mm !important;
+        height: 202mm !important;
         margin: 0 !important;
         padding: 0 !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        background: #ffffff !important;
+        overflow: hidden !important;
+      }
+
+      #previewArea {
+        display: block !important;
+        width: 289mm !important;
+        height: 202mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+        page-break-before: avoid !important;
         page-break-after: avoid !important;
         page-break-inside: avoid !important;
       }
 
       .preview-shell {
-        background: #ffffff !important;
-        border: 0 !important;
-        box-shadow: none !important;
-        padding: 0 !important;
+        width: 289mm !important;
+        height: 202mm !important;
         margin: 0 !important;
-        page-break-inside: avoid !important;
-        transform: scale(0.62) !important;
-        transform-origin: top left !important;
-        width: 161.5% !important;
-      }
-
-      .brand-banner,
-      .brand-banner.preview,
-      .sheet-frame {
+        padding: 0 !important;
+        border: 0 !important;
+        border-radius: 0 !important;
         box-shadow: none !important;
+        background: #ffffff !important;
+        overflow: hidden !important;
+        transform: none !important;
       }
 
       .brand-banner.preview {
-        min-height: 66px !important;
-        padding: 10px 16px !important;
-        margin-bottom: 6px !important;
+        width: 289mm !important;
+        min-height: 28mm !important;
+        height: 28mm !important;
+        margin: 0 0 3mm 0 !important;
+        padding: 4mm 6mm !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
       }
 
-      .preview-period-title {
-        font-size: 22px !important;
+      .orlen-mark {
+        width: 15mm !important;
+        height: 15mm !important;
+        min-width: 15mm !important;
+        border-radius: 4mm !important;
+      }
+
+      .brand-title {
+        font-size: 18pt !important;
+      }
+
+      .brand-title .gaz {
+        font-size: 12pt !important;
+        padding: 1mm 2mm !important;
+      }
+
+      .brand-side-logo {
+        width: 45mm !important;
+        height: 18mm !important;
+        padding: 2mm !important;
+      }
+
+      .brand-side-logo img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: contain !important;
+      }
+
+      #previewArea .preview-period-title {
+        font-size: 18pt !important;
       }
 
       .sheet-frame {
-        padding: 4px !important;
+        width: 289mm !important;
+        height: 132mm !important;
         margin: 0 !important;
-        overflow: visible !important;
+        padding: 0 2mm !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        background: #ffffff !important;
+        overflow: hidden !important;
       }
 
       .sheet-frame::before {
@@ -1024,25 +1072,64 @@
       }
 
       table.sheet {
-        width: 100% !important;
+        width: 285mm !important;
+        max-width: 285mm !important;
         table-layout: fixed !important;
-        border-spacing: 4px !important;
+        border-collapse: separate !important;
+        border-spacing: 1.2mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        background: transparent !important;
       }
 
       .sheet td,
       .sheet th {
-        padding: 4px 3px !important;
-        font-size: 11px !important;
+        height: 8.2mm !important;
+        min-height: 8.2mm !important;
+        padding: 1mm 1mm !important;
+        font-size: 7.2pt !important;
+        line-height: 1 !important;
+        border-radius: 2mm !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
       }
 
-      .sheet td.editable,
-      .sheet td.formula {
-        box-shadow: none !important;
+      .sheet td span {
+        min-height: 0 !important;
+        line-height: 1 !important;
       }
 
-      .pay-amount,
-      .pay-amount span {
-        font-size: 24px !important;
+      .sheet .header-space,
+      #previewArea .spacer-row {
+        display: none !important;
+      }
+
+      .sheet td.left-label {
+        font-size: 9pt !important;
+      }
+
+      .sheet td.side-result,
+      .sheet td.total-main {
+        font-size: 12pt !important;
+      }
+
+      .sheet td.pay-banner {
+        height: 8mm !important;
+        font-size: 9pt !important;
+      }
+
+      .sheet td.pay-amount {
+        height: 14mm !important;
+        font-size: 18pt !important;
+      }
+
+      .sheet td.pay-amount span {
+        font-size: 18pt !important;
+      }
+
+      .pay-value-row td {
+        height: 13mm !important;
       }
     }
   </style>
@@ -1223,7 +1310,7 @@
     </section>
   </div>
 
-  <div class="app-version" id="appVersion">ORLEN1019</div>
+  <div class="app-version" id="appVersion">ORLEN1020</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -1232,7 +1319,7 @@
   <div class="update-success-toast" id="updateSuccessToast">Uaktualniono do najnowszej wersji</div>
 
   <script>
-    const APP_VERSION = "ORLEN1019";
+    const APP_VERSION = "ORLEN1020";
 
     function normText(s) {
       return (s ?? "").toString().trim();
