@@ -1313,6 +1313,20 @@
 
 
 
+    .orlen-build-badge {
+      position: fixed;
+      left: 10px;
+      top: 10px;
+      z-index: 999999;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: #0b2d52;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 900;
+      box-shadow: 0 8px 22px rgba(0,0,0,.2);
+    }
+
     .orlen-save-toast {
       position: fixed;
       left: 50%;
@@ -1714,7 +1728,7 @@
     </div>
   </section>
 
-  <div class="app-version" id="appVersion">ORLEN1060</div>
+  <div class="app-version" id="appVersion">ORLEN1061</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -1723,7 +1737,7 @@
   <div class="update-success-toast" id="updateSuccessToast">Uaktualniono do najnowszej wersji</div>
 
   <script>
-    const APP_VERSION = "ORLEN1060";
+    const APP_VERSION = "ORLEN1061";
 
     function normText(s) {
       return (s ?? "").toString().trim();
@@ -2114,6 +2128,7 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
   
 
 
+    const ORLEN_THIS_BUILD = "ORLEN1061";
     const ORLEN_SAVE_KEY = "ORLEN_GAZ_ZAPIS_DODAJ";
     const ORLEN_FIELDS = [
       "dateFrom",
@@ -2128,6 +2143,33 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
       "rateFixed",
       "rateSubscription"
     ];
+
+    function orlenShowBuildBadge() {
+      let badge = document.getElementById("orlenBuildBadge");
+      if (!badge) {
+        badge = document.createElement("div");
+        badge.id = "orlenBuildBadge";
+        badge.className = "orlen-build-badge";
+        document.body.appendChild(badge);
+      }
+      badge.textContent = ORLEN_THIS_BUILD;
+    }
+
+    async function orlenClearOldCachesOnce() {
+      try {
+        if ("caches" in window) {
+          const names = await caches.keys();
+          await Promise.all(names.map(name => caches.delete(name)));
+        }
+      } catch (err) {}
+
+      try {
+        if ("serviceWorker" in navigator) {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          await Promise.all(regs.map(reg => reg.update()));
+        }
+      } catch (err) {}
+    }
 
     function orlenToast(text, ok = true) {
       let box = document.getElementById("orlenSaveToast");
@@ -2146,7 +2188,7 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
 
       setTimeout(() => {
         box.style.display = "none";
-      }, 3000);
+      }, 3500);
     }
 
     function orlenCollectFields() {
@@ -2156,6 +2198,7 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
         if (el) data[id] = el.value;
       });
       data.savedAt = new Date().toISOString();
+      data.build = ORLEN_THIS_BUILD;
       return data;
     }
 
@@ -2308,10 +2351,16 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
 
     window.orlenSaveFromDodaj = orlenSaveFromDodaj;
 
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", orlenLoadSavedOnStart);
-    } else {
+    async function orlenBoot1061() {
+      orlenShowBuildBadge();
+      await orlenClearOldCachesOnce();
       orlenLoadSavedOnStart();
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", orlenBoot1061);
+    } else {
+      orlenBoot1061();
     }
 
 
