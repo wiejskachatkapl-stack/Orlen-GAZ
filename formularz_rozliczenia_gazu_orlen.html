@@ -932,15 +932,109 @@
       font-weight: 900 !important;
     }
 
+    
+    @page {
+      size: A4 landscape;
+      margin: 5mm;
+    }
+
     @media print {
-      body { background: #fff; padding: 0; }
-      .wrap { box-shadow: none; border-radius: 0; padding: 0; }
-      .toolbar, .formula-bar { display: none; }
-      .preview-shell { background: #fff; border: 0; box-shadow: none; padding: 0; }
-      .brand-banner { box-shadow: none; }
-      .sheet-frame { box-shadow: none; padding: 0; }
-      .sheet-frame::before { display: none; }
-      .sheet td.editable { background: #fff; }
+      html, body {
+        width: 297mm;
+        height: 210mm;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #fff !important;
+        overflow: hidden !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      body {
+        zoom: 0.76;
+      }
+
+      .wrap {
+        width: 100% !important;
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+      }
+
+      #entryPanel,
+      .toolbar,
+      .formula-bar,
+      .mobile-preview,
+      .view-hint {
+        display: none !important;
+      }
+
+      #previewArea {
+        display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        page-break-after: avoid !important;
+        page-break-inside: avoid !important;
+      }
+
+      .preview-shell {
+        background: #fff !important;
+        border: 0 !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        page-break-inside: avoid !important;
+      }
+
+      .brand-banner,
+      .brand-banner.preview,
+      .sheet-frame {
+        box-shadow: none !important;
+      }
+
+      .brand-banner.preview {
+        min-height: 68px !important;
+        padding: 12px 18px !important;
+        margin-bottom: 8px !important;
+      }
+
+      .preview-period-title {
+        font-size: 22px !important;
+      }
+
+      .sheet-frame {
+        padding: 6px !important;
+        margin: 0 !important;
+      }
+
+      .sheet-frame::before {
+        display: none !important;
+      }
+
+      .sheet {
+        width: 100% !important;
+        table-layout: fixed !important;
+        font-size: 11px !important;
+      }
+
+      .sheet td,
+      .sheet th {
+        padding: 5px 4px !important;
+      }
+
+      .sheet td.editable {
+        background: #fff !important;
+      }
+
+      .pay-amount span {
+        font-size: 26px !important;
+      }
+
+      .app-version {
+        display: none !important;
+      }
     }
   </style>
 </head>
@@ -1120,7 +1214,7 @@
     </section>
   </div>
 
-  <div class="app-version" id="appVersion">ORLEN1017</div>
+  <div class="app-version" id="appVersion">ORLEN1018</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -1129,7 +1223,7 @@
   <div class="update-success-toast" id="updateSuccessToast">Uaktualniono do najnowszej wersji</div>
 
   <script>
-    const APP_VERSION = "ORLEN1017";
+    const APP_VERSION = "ORLEN1018";
 
     function normText(s) {
       return (s ?? "").toString().trim();
