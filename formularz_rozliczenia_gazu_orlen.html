@@ -1694,7 +1694,7 @@
     </div>
   </section>
 
-  <div class="app-version" id="appVersion">ORLEN1041</div>
+  <div class="app-version" id="appVersion">ORLEN1042</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -1703,7 +1703,67 @@
   <div class="update-success-toast" id="updateSuccessToast">Uaktualniono do najnowszej wersji</div>
 
   <script>
-    const APP_VERSION = "ORLEN1041";
+    const APP_VERSION = "ORLEN1042";
+
+
+    const ORLEN_STORAGE_KEY = "orlenGazUserValues_v3";
+    const ORLEN_FORM_IDS = [
+      "dateFrom", "dateTo", "mainFrom", "mainTo", "topFrom", "topTo",
+      "rateFactor", "rateFuel", "rateVariable", "rateFixed", "rateSubscription"
+    ];
+
+    function saveUserValues() {
+      try {
+        const data = {};
+        ORLEN_FORM_IDS.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) data[id] = el.value;
+        });
+        localStorage.setItem(ORLEN_STORAGE_KEY, JSON.stringify(data));
+      } catch (err) {
+        console.warn("Nie udało się zapisać wartości.", err);
+      }
+    }
+
+    function loadUserValues() {
+      try {
+        const raw = localStorage.getItem(ORLEN_STORAGE_KEY);
+        if (!raw) return false;
+        const data = JSON.parse(raw);
+        ORLEN_FORM_IDS.forEach(id => {
+          const el = document.getElementById(id);
+          if (el && Object.prototype.hasOwnProperty.call(data, id)) {
+            el.value = data[id];
+          }
+        });
+        return true;
+      } catch (err) {
+        console.warn("Nie udało się wczytać wartości.", err);
+        return false;
+      }
+    }
+
+    function attachUserValuesAutosave() {
+      ORLEN_FORM_IDS.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener("input", saveUserValues);
+        el.addEventListener("change", saveUserValues);
+        el.addEventListener("blur", saveUserValues);
+      });
+    }
+
+    function refreshFromLoadedValues() {
+      if (typeof updateRatesFromPanel === "function") {
+        try { updateRatesFromPanel(); } catch (err) {}
+      }
+      if (typeof updateMobileView === "function") {
+        try { updateMobileView(); } catch (err) {}
+      }
+      if (typeof updatePrintReport === "function") {
+        try { updatePrintReport(); } catch (err) {}
+      }
+    }
 
     function normText(s) {
       return (s ?? "").toString().trim();
@@ -2075,13 +2135,13 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
       });
     });
 
-    document.getElementById("addReadingBtn").addEventListener("click", applyEntryForm);
+    document.getElementById("addReadingBtn").addEventListener("click", () => { saveUserValues(); applyEntryForm(); saveUserValues(); });
     document.getElementById("changeRatesBtn").addEventListener("click", () => {
       document.getElementById("ratesPanel").classList.toggle("open");
     });
     document.getElementById("exitAppBtn")?.addEventListener("click", exitApplication);
     document.getElementById("exitAppBtnPreview")?.addEventListener("click", exitApplication);
-    document.getElementById("updateRatesBtn").addEventListener("click", () => { saveOrlenState(); updateRatesFromPanel(); });
+    document.getElementById("updateRatesBtn").addEventListener("click", () => { saveUserValues(); updateRatesFromPanel(); saveUserValues(); });
     document.getElementById("closeRatesBtn")?.addEventListener("click", () => {
       const panel = document.getElementById("ratesPanel");
       if (panel) panel.classList.remove("open");
@@ -2091,65 +2151,12 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
     checkVersionMarker();
     showUpdateSuccessIfNeeded();
     registerAutoUpdate();
+
+    // Wczytanie ostatnich wpisanych wartości po pełnym załadowaniu elementów formularza.
+    loadUserValues();
+    attachUserValuesAutosave();
+    refreshFromLoadedValues();
   
-
-
-
-    const ORLEN_STORAGE_KEY = "orlenGazSavedState_v2";
-
-    function getOrlenSavableElements() {
-      return Array.from(document.querySelectorAll("input, select, textarea"))
-        .filter(el => el.id && !el.disabled && el.type !== "button" && el.type !== "submit");
-    }
-
-    function saveOrlenState() {
-      try {
-        const state = {};
-        getOrlenSavableElements().forEach(el => {
-          state[el.id] = el.value;
-        });
-        localStorage.setItem(ORLEN_STORAGE_KEY, JSON.stringify(state));
-      } catch (err) {
-        console.warn("Nie udało się zapisać danych.", err);
-      }
-    }
-
-    function loadOrlenState() {
-      try {
-        const raw = localStorage.getItem(ORLEN_STORAGE_KEY);
-        if (!raw) return;
-        const state = JSON.parse(raw);
-        Object.entries(state).forEach(([id, value]) => {
-          const el = document.getElementById(id);
-          if (el && value !== undefined && value !== null) {
-            el.value = value;
-          }
-        });
-      } catch (err) {
-        console.warn("Nie udało się wczytać danych.", err);
-      }
-    }
-
-    function attachOrlenAutosave() {
-      getOrlenSavableElements().forEach(el => {
-        el.addEventListener("input", saveOrlenState);
-        el.addEventListener("change", saveOrlenState);
-        el.addEventListener("blur", saveOrlenState);
-      });
-    }
-
-    function restoreAndRefreshOrlenState() {
-      loadOrlenState();
-
-      if (typeof updateRatesFromPanel === "function") {
-        try { updateRatesFromPanel(); } catch (err) {}
-      }
-
-      if (typeof updatePrintReport === "function") {
-        try { updatePrintReport(); } catch (err) {}
-      }
-    }
-
 
     function updatePrintReport() {
       if (typeof getRaw !== "function") return;
@@ -2209,8 +2216,6 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
     }
 
     window.addEventListener("load", () => {
-      restoreAndRefreshOrlenState();
-      attachOrlenAutosave();
       if (typeof updatePrintReport === "function") {
         updatePrintReport();
         setInterval(updatePrintReport, 500);
