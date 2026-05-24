@@ -1312,6 +1312,26 @@
     }
 
 
+
+    .manual-save-info {
+      display: none;
+      margin-left: 10px;
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: #e7fff2;
+      color: #0a6b36;
+      font-weight: 800;
+      border: 1px solid #9fe0bb;
+    }
+
+    .manual-save-preview {
+      display: inline-flex;
+    }
+
+    .manual-save-preview.show-save {
+      display: inline-flex !important;
+    }
+
     @page {
       size: A4 portrait;
       margin: 6mm;
@@ -1493,6 +1513,8 @@
       </div>
       <div class="form-actions">
         <button type="button" id="addReadingBtn">Dodaj</button>
+        <button type="button" id="manualSaveBtn">Zapisz</button>
+        <span id="manualSaveInfo" class="manual-save-info">Zapisano ostatnie dane</span>
         <button type="button" id="changeRatesBtn">Zmień wartości</button>
                 <button type="button" id="exitAppBtn" class="exit-btn">Koniec</button>
 <span id="formError" class="error">Uzupełnij poprawnie wszystkie pola. Stan końcowy nie może być mniejszy od początkowego.</span>
@@ -1548,7 +1570,8 @@
     </div>
     <div class="toolbar">
       <div class="note"></div>
-      <button type="button" onclick="prepareAndPrintReport()">Drukuj / zapisz PDF</button>
+      <button type="button" onclick="prepareAndPrintReport()" id="printPdfBtn">Drukuj / zapisz PDF</button>
+      <button type="button" id="manualSaveBtnPreview" class="manual-save-preview">Zapisz</button>
       <button type="button" id="exitAppBtnPreview" class="exit-btn">Koniec</button>
 </div>
 
@@ -1694,7 +1717,7 @@
     </div>
   </section>
 
-  <div class="app-version" id="appVersion">ORLEN1045</div>
+  <div class="app-version" id="appVersion">ORLEN1046</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -1703,7 +1726,7 @@
   <div class="update-success-toast" id="updateSuccessToast">Uaktualniono do najnowszej wersji</div>
 
   <script>
-    const APP_VERSION = "ORLEN1045";
+    const APP_VERSION = "ORLEN1046";
 
     function normText(s) {
       return (s ?? "").toString().trim();
@@ -2094,8 +2117,9 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
   
 
 
-    const ORLEN_SAVE_KEY = "ORLEN_GAZ_LAST_INPUTS_1045";
-    const ORLEN_SAVE_IDS = [
+
+    const ORLEN_MANUAL_SAVE_KEY = "ORLEN_GAZ_MANUAL_SAVE_1046";
+    const ORLEN_MANUAL_SAVE_IDS = [
       "dateFrom",
       "dateTo",
       "mainFrom",
@@ -2109,37 +2133,50 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
       "rateSubscription"
     ];
 
-    function orlenSaveInputs() {
+    function orlenManualSave() {
       try {
         const data = {};
-        ORLEN_SAVE_IDS.forEach(id => {
+        ORLEN_MANUAL_SAVE_IDS.forEach(id => {
           const el = document.getElementById(id);
           if (el) data[id] = el.value;
         });
-        localStorage.setItem(ORLEN_SAVE_KEY, JSON.stringify(data));
+        localStorage.setItem(ORLEN_MANUAL_SAVE_KEY, JSON.stringify(data));
+
+        const msg = document.getElementById("manualSaveInfo");
+        if (msg) {
+          msg.textContent = "Zapisano ostatnie dane";
+          msg.style.display = "inline-block";
+          setTimeout(() => {
+            msg.style.display = "none";
+          }, 2200);
+        }
       } catch (err) {
-        console.warn("ORLEN zapis nieudany", err);
+        alert("Nie udało się zapisać danych.");
       }
     }
 
-    function orlenLoadInputs() {
+    function orlenManualLoad() {
       try {
-        const raw = localStorage.getItem(ORLEN_SAVE_KEY);
+        const raw = localStorage.getItem(ORLEN_MANUAL_SAVE_KEY);
         if (!raw) return;
 
         const data = JSON.parse(raw);
-        ORLEN_SAVE_IDS.forEach(id => {
+        ORLEN_MANUAL_SAVE_IDS.forEach(id => {
           const el = document.getElementById(id);
           if (el && Object.prototype.hasOwnProperty.call(data, id)) {
             el.value = data[id];
           }
         });
+
+        if (typeof orlenApplySavedValuesToTemplate === "function") {
+          orlenApplySavedValuesToTemplate();
+        }
       } catch (err) {
-        console.warn("ORLEN wczytanie nieudane", err);
+        console.warn("Nie udało się wczytać zapisanych danych.", err);
       }
     }
 
-    function orlenApplyInputsToCells() {
+    function orlenApplySavedValuesToTemplate() {
       if (typeof setCell !== "function") return;
 
       const dateFrom = document.getElementById("dateFrom")?.value || "";
@@ -2194,29 +2231,27 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
       if (typeof updatePrintReport === "function") updatePrintReport();
     }
 
-    function orlenInitSavedInputs() {
-      orlenLoadInputs();
-      orlenApplyInputsToCells();
+    function orlenInitManualSaveButton() {
+      orlenManualLoad();
 
-      ORLEN_SAVE_IDS.forEach(id => {
-        const el = document.getElementById(id);
-        if (!el) return;
-
-        el.addEventListener("input", () => {
-          orlenSaveInputs();
-          orlenApplyInputsToCells();
-        });
-        el.addEventListener("change", () => {
-          orlenSaveInputs();
-          orlenApplyInputsToCells();
-        });
-        el.addEventListener("blur", orlenSaveInputs);
+      document.getElementById("manualSaveBtn")?.addEventListener("click", () => {
+        orlenApplySavedValuesToTemplate();
+        orlenManualSave();
       });
 
-      window.addEventListener("beforeunload", orlenSaveInputs);
-      window.addEventListener("pagehide", orlenSaveInputs);
-      document.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === "hidden") orlenSaveInputs();
+      document.getElementById("manualSaveBtnPreview")?.addEventListener("click", () => {
+        orlenApplySavedValuesToTemplate();
+        orlenManualSave();
+      });
+
+      document.getElementById("addReadingBtn")?.addEventListener("click", () => {
+        setTimeout(() => {
+          document.getElementById("manualSaveBtnPreview")?.classList.add("show-save");
+        }, 300);
+      });
+
+      document.getElementById("printPdfBtn")?.addEventListener("click", () => {
+        document.getElementById("manualSaveBtnPreview")?.classList.add("show-save");
       });
     }
 
@@ -2279,7 +2314,7 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
     }
 
     window.addEventListener("load", () => {
-      orlenInitSavedInputs();
+      orlenInitManualSaveButton();
       if (typeof updatePrintReport === "function") {
         updatePrintReport();
         setInterval(updatePrintReport, 500);
@@ -2287,6 +2322,8 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
     });
 
     function prepareAndPrintReport() {
+      if (typeof orlenApplySavedValuesToTemplate === "function") orlenApplySavedValuesToTemplate();
+      if (typeof orlenManualSave === "function") orlenManualSave();
       if (typeof updatePrintReport === "function") {
         updatePrintReport();
       }
