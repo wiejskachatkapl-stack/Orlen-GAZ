@@ -1694,7 +1694,7 @@
     </div>
   </section>
 
-  <div class="app-version" id="appVersion">ORLEN1040</div>
+  <div class="app-version" id="appVersion">ORLEN1041</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -1703,7 +1703,7 @@
   <div class="update-success-toast" id="updateSuccessToast">Uaktualniono do najnowszej wersji</div>
 
   <script>
-    const APP_VERSION = "ORLEN1040";
+    const APP_VERSION = "ORLEN1041";
 
     function normText(s) {
       return (s ?? "").toString().trim();
@@ -2094,37 +2094,23 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
   
 
 
-    const ORLEN_STORAGE_KEY = "orlenGazSavedState_v1";
 
-    function collectSavedState() {
-      const ids = [
-        "dateFromInput",
-        "dateToInput",
-        "mainStartInput",
-        "mainEndInput",
-        "topStartInput",
-        "topEndInput",
-        "rateCoeffInput",
-        "rateFuelInput",
-        "rateVariableInput",
-        "rateFixedInput",
-        "rateSubscriptionInput"
-      ];
+    const ORLEN_STORAGE_KEY = "orlenGazSavedState_v2";
 
-      const state = {};
-      ids.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) state[id] = el.value;
-      });
-
-      return state;
+    function getOrlenSavableElements() {
+      return Array.from(document.querySelectorAll("input, select, textarea"))
+        .filter(el => el.id && !el.disabled && el.type !== "button" && el.type !== "submit");
     }
 
     function saveOrlenState() {
       try {
-        localStorage.setItem(ORLEN_STORAGE_KEY, JSON.stringify(collectSavedState()));
+        const state = {};
+        getOrlenSavableElements().forEach(el => {
+          state[el.id] = el.value;
+        });
+        localStorage.setItem(ORLEN_STORAGE_KEY, JSON.stringify(state));
       } catch (err) {
-        console.warn("Nie udało się zapisać danych formularza.", err);
+        console.warn("Nie udało się zapisać danych.", err);
       }
     }
 
@@ -2132,7 +2118,6 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
       try {
         const raw = localStorage.getItem(ORLEN_STORAGE_KEY);
         if (!raw) return;
-
         const state = JSON.parse(raw);
         Object.entries(state).forEach(([id, value]) => {
           const el = document.getElementById(id);
@@ -2141,31 +2126,28 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
           }
         });
       } catch (err) {
-        console.warn("Nie udało się wczytać zapisanych danych formularza.", err);
+        console.warn("Nie udało się wczytać danych.", err);
       }
     }
 
     function attachOrlenAutosave() {
-      const ids = [
-        "dateFromInput",
-        "dateToInput",
-        "mainStartInput",
-        "mainEndInput",
-        "topStartInput",
-        "topEndInput",
-        "rateCoeffInput",
-        "rateFuelInput",
-        "rateVariableInput",
-        "rateFixedInput",
-        "rateSubscriptionInput"
-      ];
-
-      ids.forEach(id => {
-        const el = document.getElementById(id);
-        if (!el) return;
+      getOrlenSavableElements().forEach(el => {
         el.addEventListener("input", saveOrlenState);
         el.addEventListener("change", saveOrlenState);
+        el.addEventListener("blur", saveOrlenState);
       });
+    }
+
+    function restoreAndRefreshOrlenState() {
+      loadOrlenState();
+
+      if (typeof updateRatesFromPanel === "function") {
+        try { updateRatesFromPanel(); } catch (err) {}
+      }
+
+      if (typeof updatePrintReport === "function") {
+        try { updatePrintReport(); } catch (err) {}
+      }
     }
 
 
@@ -2227,7 +2209,7 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
     }
 
     window.addEventListener("load", () => {
-      loadOrlenState();
+      restoreAndRefreshOrlenState();
       attachOrlenAutosave();
       if (typeof updatePrintReport === "function") {
         updatePrintReport();
