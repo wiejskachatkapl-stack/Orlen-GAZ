@@ -1495,7 +1495,7 @@
     </div>
   </section>
 
-  <div class="app-version" id="appVersion">ORLEN1024</div>
+  <div class="app-version" id="appVersion">ORLEN1025</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -1504,7 +1504,7 @@
   <div class="update-success-toast" id="updateSuccessToast">Uaktualniono do najnowszej wersji</div>
 
   <script>
-    const APP_VERSION = "ORLEN1024";
+    const APP_VERSION = "ORLEN1025";
 
     function normText(s) {
       return (s ?? "").toString().trim();
@@ -2263,11 +2263,39 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
 
     function printReportOnly() {
       updatePrintReport();
-      const win = window.open("", "_blank", "noopener,noreferrer,width=1000,height=1400");
-      if (!win) {
-        alert("Przeglądarka zablokowała okno wydruku. Zezwól na wyskakujące okna i spróbuj ponownie.");
-        return;
-      }
+
+      const oldFrame = document.getElementById("orlenPrintFrame");
+      if (oldFrame) oldFrame.remove();
+
+      const iframe = document.createElement("iframe");
+      iframe.id = "orlenPrintFrame";
+      iframe.style.position = "fixed";
+      iframe.style.right = "0";
+      iframe.style.bottom = "0";
+      iframe.style.width = "0";
+      iframe.style.height = "0";
+      iframe.style.border = "0";
+      iframe.style.opacity = "0";
+      iframe.setAttribute("aria-hidden", "true");
+
+      document.body.appendChild(iframe);
+
+      const doc = iframe.contentWindow.document;
+      doc.open();
+      doc.write(buildPrintReportHtml());
+      doc.close();
+
+      iframe.onload = () => {
+        setTimeout(() => {
+          iframe.contentWindow.focus();
+          iframe.contentWindow.print();
+
+          setTimeout(() => {
+            iframe.remove();
+          }, 1500);
+        }, 350);
+      };
+    }
       win.document.open();
       win.document.write(buildPrintReportHtml());
       win.document.close();
