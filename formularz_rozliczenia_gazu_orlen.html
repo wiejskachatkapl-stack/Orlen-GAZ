@@ -672,6 +672,11 @@
         margin: 0;
         padding: 12px;
       }
+
+      #previewArea .preview-period-title,
+      .preview-period-title {
+        display: none !important;
+      }
       .entry-panel h1 {
         font-size: 22px;
       }
@@ -1575,7 +1580,7 @@
     </div>
   </section>
 
-  <div class="app-version" id="appVersion">ORLEN1028</div>
+  <div class="app-version" id="appVersion">ORLEN1029</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -1584,7 +1589,7 @@
   <div class="update-success-toast" id="updateSuccessToast">Uaktualniono do najnowszej wersji</div>
 
   <script>
-    const APP_VERSION = "ORLEN1028";
+    const APP_VERSION = "ORLEN1029";
 
     function normText(s) {
       return (s ?? "").toString().trim();
