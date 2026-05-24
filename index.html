@@ -1313,7 +1313,7 @@
 
 
 
-    .orlen-save-status {
+    .orlen-save-toast {
       position: fixed;
       left: 50%;
       top: 18px;
@@ -1326,9 +1326,9 @@
       font-weight: 900;
       font-size: 14px;
       box-shadow: 0 10px 30px rgba(0,0,0,.22);
-      border: 1px solid rgba(255,255,255,.35);
       background: #e8fff2;
       color: #0a6b36;
+      border: 1px solid #9fe0bb;
       text-align: center;
     }
 
@@ -1512,7 +1512,7 @@
         </div>
       </div>
       <div class="form-actions">
-        <button type="button" id="addReadingBtn">Dodaj</button>
+        <button type="button" id="addReadingBtn" onclick="orlenSaveFromDodaj();">Dodaj</button>
         <button type="button" id="changeRatesBtn">Zmień wartości</button>
                 <button type="button" id="exitAppBtn" class="exit-btn">Koniec</button>
 <span id="formError" class="error">Uzupełnij poprawnie wszystkie pola. Stan końcowy nie może być mniejszy od początkowego.</span>
@@ -1714,7 +1714,7 @@
     </div>
   </section>
 
-  <div class="app-version" id="appVersion">ORLEN1059</div>
+  <div class="app-version" id="appVersion">ORLEN1060</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -1723,7 +1723,7 @@
   <div class="update-success-toast" id="updateSuccessToast">Uaktualniono do najnowszej wersji</div>
 
   <script>
-    const APP_VERSION = "ORLEN1059";
+    const APP_VERSION = "ORLEN1060";
 
     function normText(s) {
       return (s ?? "").toString().trim();
@@ -2114,8 +2114,8 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
   
 
 
-    const ORLEN_DIAG_KEY = "ORLEN_GAZ_ZAPIS_DIAG_1059";
-    const ORLEN_DIAG_FIELDS = [
+    const ORLEN_SAVE_KEY = "ORLEN_GAZ_ZAPIS_DODAJ";
+    const ORLEN_FIELDS = [
       "dateFrom",
       "dateTo",
       "mainFrom",
@@ -2129,12 +2129,12 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
       "rateSubscription"
     ];
 
-    function orlenDiagStatus(text, ok = true) {
-      let box = document.getElementById("orlenSaveStatus");
+    function orlenToast(text, ok = true) {
+      let box = document.getElementById("orlenSaveToast");
       if (!box) {
         box = document.createElement("div");
-        box.id = "orlenSaveStatus";
-        box.className = "orlen-save-status";
+        box.id = "orlenSaveToast";
+        box.className = "orlen-save-toast";
         document.body.appendChild(box);
       }
 
@@ -2142,15 +2142,16 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
       box.style.display = "block";
       box.style.background = ok ? "#e8fff2" : "#ffe8e8";
       box.style.color = ok ? "#0a6b36" : "#9b1111";
+      box.style.borderColor = ok ? "#9fe0bb" : "#f2a0a0";
 
       setTimeout(() => {
         box.style.display = "none";
-      }, 3500);
+      }, 3000);
     }
 
-    function orlenDiagCollect() {
+    function orlenCollectFields() {
       const data = {};
-      ORLEN_DIAG_FIELDS.forEach(id => {
+      ORLEN_FIELDS.forEach(id => {
         const el = document.getElementById(id);
         if (el) data[id] = el.value;
       });
@@ -2158,11 +2159,75 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
       return data;
     }
 
-    function orlenDiagApply(data) {
-      if (!data || typeof data !== "object") return false;
-      let applied = false;
+    function orlenSaveFromDodaj() {
+      const raw = JSON.stringify(orlenCollectFields());
+      let ok = false;
+      let method = "";
 
-      ORLEN_DIAG_FIELDS.forEach(id => {
+      try {
+        localStorage.setItem(ORLEN_SAVE_KEY, raw);
+        if (localStorage.getItem(ORLEN_SAVE_KEY) === raw) {
+          ok = true;
+          method = "localStorage";
+        }
+      } catch (err) {}
+
+      if (!ok) {
+        try {
+          sessionStorage.setItem(ORLEN_SAVE_KEY, raw);
+          if (sessionStorage.getItem(ORLEN_SAVE_KEY) === raw) {
+            ok = true;
+            method = "sessionStorage";
+          }
+        } catch (err) {}
+      }
+
+      if (!ok) {
+        try {
+          document.cookie = ORLEN_SAVE_KEY + "=" + encodeURIComponent(raw) + "; max-age=31536000; path=/; SameSite=Lax";
+          if (document.cookie.includes(ORLEN_SAVE_KEY + "=")) {
+            ok = true;
+            method = "cookie";
+          }
+        } catch (err) {}
+      }
+
+      if (ok) {
+        orlenToast("Zapisano dane: " + method, true);
+      } else {
+        orlenToast("Nie zapisano — pamięć zablokowana", false);
+      }
+
+      return true;
+    }
+
+    function orlenCookieRead() {
+      try {
+        const parts = document.cookie.split(";").map(v => v.trim());
+        const found = parts.find(v => v.startsWith(ORLEN_SAVE_KEY + "="));
+        return found ? decodeURIComponent(found.substring(ORLEN_SAVE_KEY.length + 1)) : "";
+      } catch (err) {
+        return "";
+      }
+    }
+
+    function orlenReadSavedRaw() {
+      let raw = "";
+
+      try { raw = localStorage.getItem(ORLEN_SAVE_KEY) || ""; } catch (err) {}
+      if (!raw) {
+        try { raw = sessionStorage.getItem(ORLEN_SAVE_KEY) || ""; } catch (err) {}
+      }
+      if (!raw) raw = orlenCookieRead();
+
+      return raw;
+    }
+
+    function orlenApplySavedData(data) {
+      if (!data || typeof data !== "object") return false;
+
+      let applied = false;
+      ORLEN_FIELDS.forEach(id => {
         const el = document.getElementById(id);
         if (el && Object.prototype.hasOwnProperty.call(data, id)) {
           el.value = data[id];
@@ -2171,7 +2236,9 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
         }
       });
 
-      if (applied && typeof setCell === "function") {
+      if (!applied) return false;
+
+      if (typeof setCell === "function") {
         const dateFrom = document.getElementById("dateFrom")?.value || "";
         const dateTo = document.getElementById("dateTo")?.value || "";
 
@@ -2224,108 +2291,27 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
         if (typeof updatePrintReport === "function") updatePrintReport();
       }
 
-      return applied;
+      return true;
     }
 
-    function orlenDiagSaveBeforeAdd() {
-      const data = orlenDiagCollect();
-      const raw = JSON.stringify(data);
-
-      let saved = false;
-      let verified = false;
-      let method = "";
-
-      try {
-        localStorage.setItem(ORLEN_DIAG_KEY, raw);
-        const readBack = localStorage.getItem(ORLEN_DIAG_KEY);
-        if (readBack === raw) {
-          saved = true;
-          verified = true;
-          method = "localStorage";
-        }
-      } catch (err) {}
-
-      if (!saved) {
-        try {
-          sessionStorage.setItem(ORLEN_DIAG_KEY, raw);
-          const readBack = sessionStorage.getItem(ORLEN_DIAG_KEY);
-          if (readBack === raw) {
-            saved = true;
-            verified = true;
-            method = "sessionStorage";
-          }
-        } catch (err) {}
-      }
-
-      if (!saved) {
-        try {
-          document.cookie = ORLEN_DIAG_KEY + "=" + encodeURIComponent(raw) + "; max-age=31536000; path=/; SameSite=Lax";
-          const found = document.cookie.includes(ORLEN_DIAG_KEY + "=");
-          if (found) {
-            saved = true;
-            verified = true;
-            method = "cookie";
-          }
-        } catch (err) {}
-      }
-
-      if (verified) {
-        orlenDiagStatus("Zapis OK: " + method);
-      } else {
-        orlenDiagStatus("Zapis NIEUDANY — pamięć przeglądarki zablokowana", false);
-      }
-    }
-
-    function orlenDiagReadCookie() {
-      try {
-        const parts = document.cookie.split(";").map(v => v.trim());
-        const found = parts.find(v => v.startsWith(ORLEN_DIAG_KEY + "="));
-        return found ? decodeURIComponent(found.substring(ORLEN_DIAG_KEY.length + 1)) : "";
-      } catch (err) {
-        return "";
-      }
-    }
-
-    function orlenDiagLoadOnStart() {
-      let raw = "";
-
-      try {
-        raw = localStorage.getItem(ORLEN_DIAG_KEY) || "";
-      } catch (err) {}
-
-      if (!raw) {
-        try {
-          raw = sessionStorage.getItem(ORLEN_DIAG_KEY) || "";
-        } catch (err) {}
-      }
-
-      if (!raw) raw = orlenDiagReadCookie();
+    function orlenLoadSavedOnStart() {
+      const raw = orlenReadSavedRaw();
       if (!raw) return;
 
       try {
         const data = JSON.parse(raw);
-        const applied = orlenDiagApply(data);
-        if (applied) {
-          setTimeout(() => orlenDiagApply(data), 250);
-          setTimeout(() => orlenDiagApply(data), 800);
-        }
+        orlenApplySavedData(data);
+        setTimeout(() => orlenApplySavedData(data), 300);
+        setTimeout(() => orlenApplySavedData(data), 900);
       } catch (err) {}
     }
 
-    function orlenDiagInit() {
-      orlenDiagLoadOnStart();
-
-      const addBtn = document.getElementById("addReadingBtn");
-      if (addBtn && addBtn.dataset.diagSaveBound !== "1") {
-        addBtn.dataset.diagSaveBound = "1";
-        addBtn.addEventListener("click", orlenDiagSaveBeforeAdd, true);
-      }
-    }
+    window.orlenSaveFromDodaj = orlenSaveFromDodaj;
 
     if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", orlenDiagInit);
+      document.addEventListener("DOMContentLoaded", orlenLoadSavedOnStart);
     } else {
-      orlenDiagInit();
+      orlenLoadSavedOnStart();
     }
 
 
@@ -2387,7 +2373,6 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
     }
 
     window.addEventListener("load", () => {
-      if (typeof orlenDiagInit === "function") orlenDiagInit();
       if (typeof updatePrintReport === "function") {
         updatePrintReport();
         setInterval(updatePrintReport, 500);
