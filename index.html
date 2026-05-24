@@ -933,25 +933,26 @@
     }
 
     
+    
     @page {
       size: A4 landscape;
-      margin: 5mm;
+      margin: 4mm;
     }
 
     @media print {
       html, body {
-        width: 297mm;
-        height: 210mm;
+        width: auto !important;
+        height: auto !important;
         margin: 0 !important;
         padding: 0 !important;
-        background: #fff !important;
-        overflow: hidden !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
+        background: #ffffff !important;
+        overflow: visible !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
       }
 
       body {
-        zoom: 0.76;
+        zoom: 1 !important;
       }
 
       .wrap {
@@ -961,18 +962,23 @@
         padding: 0 !important;
         box-shadow: none !important;
         border-radius: 0 !important;
+        background: #ffffff !important;
       }
 
       #entryPanel,
       .toolbar,
       .formula-bar,
       .mobile-preview,
-      .view-hint {
+      .view-hint,
+      .update-toast,
+      .update-success-toast,
+      .app-version {
         display: none !important;
       }
 
       #previewArea {
         display: block !important;
+        width: 100% !important;
         margin: 0 !important;
         padding: 0 !important;
         page-break-after: avoid !important;
@@ -980,12 +986,15 @@
       }
 
       .preview-shell {
-        background: #fff !important;
+        background: #ffffff !important;
         border: 0 !important;
         box-shadow: none !important;
         padding: 0 !important;
         margin: 0 !important;
         page-break-inside: avoid !important;
+        transform: scale(0.62) !important;
+        transform-origin: top left !important;
+        width: 161.5% !important;
       }
 
       .brand-banner,
@@ -995,9 +1004,9 @@
       }
 
       .brand-banner.preview {
-        min-height: 68px !important;
-        padding: 12px 18px !important;
-        margin-bottom: 8px !important;
+        min-height: 66px !important;
+        padding: 10px 16px !important;
+        margin-bottom: 6px !important;
       }
 
       .preview-period-title {
@@ -1005,35 +1014,35 @@
       }
 
       .sheet-frame {
-        padding: 6px !important;
+        padding: 4px !important;
         margin: 0 !important;
+        overflow: visible !important;
       }
 
       .sheet-frame::before {
         display: none !important;
       }
 
-      .sheet {
+      table.sheet {
         width: 100% !important;
         table-layout: fixed !important;
-        font-size: 11px !important;
+        border-spacing: 4px !important;
       }
 
       .sheet td,
       .sheet th {
-        padding: 5px 4px !important;
+        padding: 4px 3px !important;
+        font-size: 11px !important;
       }
 
-      .sheet td.editable {
-        background: #fff !important;
+      .sheet td.editable,
+      .sheet td.formula {
+        box-shadow: none !important;
       }
 
+      .pay-amount,
       .pay-amount span {
-        font-size: 26px !important;
-      }
-
-      .app-version {
-        display: none !important;
+        font-size: 24px !important;
       }
     }
   </style>
@@ -1214,7 +1223,7 @@
     </section>
   </div>
 
-  <div class="app-version" id="appVersion">ORLEN1018</div>
+  <div class="app-version" id="appVersion">ORLEN1019</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -1223,7 +1232,7 @@
   <div class="update-success-toast" id="updateSuccessToast">Uaktualniono do najnowszej wersji</div>
 
   <script>
-    const APP_VERSION = "ORLEN1018";
+    const APP_VERSION = "ORLEN1019";
 
     function normText(s) {
       return (s ?? "").toString().trim();
