@@ -1694,7 +1694,7 @@
     </div>
   </section>
 
-  <div class="app-version" id="appVersion">ORLEN1039</div>
+  <div class="app-version" id="appVersion">ORLEN1040</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -1703,7 +1703,7 @@
   <div class="update-success-toast" id="updateSuccessToast">Uaktualniono do najnowszej wersji</div>
 
   <script>
-    const APP_VERSION = "ORLEN1039";
+    const APP_VERSION = "ORLEN1040";
 
     function normText(s) {
       return (s ?? "").toString().trim();
@@ -2081,7 +2081,7 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
     });
     document.getElementById("exitAppBtn")?.addEventListener("click", exitApplication);
     document.getElementById("exitAppBtnPreview")?.addEventListener("click", exitApplication);
-    document.getElementById("updateRatesBtn").addEventListener("click", updateRatesFromPanel);
+    document.getElementById("updateRatesBtn").addEventListener("click", () => { saveOrlenState(); updateRatesFromPanel(); });
     document.getElementById("closeRatesBtn")?.addEventListener("click", () => {
       const panel = document.getElementById("ratesPanel");
       if (panel) panel.classList.remove("open");
@@ -2092,6 +2092,82 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
     showUpdateSuccessIfNeeded();
     registerAutoUpdate();
   
+
+
+    const ORLEN_STORAGE_KEY = "orlenGazSavedState_v1";
+
+    function collectSavedState() {
+      const ids = [
+        "dateFromInput",
+        "dateToInput",
+        "mainStartInput",
+        "mainEndInput",
+        "topStartInput",
+        "topEndInput",
+        "rateCoeffInput",
+        "rateFuelInput",
+        "rateVariableInput",
+        "rateFixedInput",
+        "rateSubscriptionInput"
+      ];
+
+      const state = {};
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) state[id] = el.value;
+      });
+
+      return state;
+    }
+
+    function saveOrlenState() {
+      try {
+        localStorage.setItem(ORLEN_STORAGE_KEY, JSON.stringify(collectSavedState()));
+      } catch (err) {
+        console.warn("Nie udało się zapisać danych formularza.", err);
+      }
+    }
+
+    function loadOrlenState() {
+      try {
+        const raw = localStorage.getItem(ORLEN_STORAGE_KEY);
+        if (!raw) return;
+
+        const state = JSON.parse(raw);
+        Object.entries(state).forEach(([id, value]) => {
+          const el = document.getElementById(id);
+          if (el && value !== undefined && value !== null) {
+            el.value = value;
+          }
+        });
+      } catch (err) {
+        console.warn("Nie udało się wczytać zapisanych danych formularza.", err);
+      }
+    }
+
+    function attachOrlenAutosave() {
+      const ids = [
+        "dateFromInput",
+        "dateToInput",
+        "mainStartInput",
+        "mainEndInput",
+        "topStartInput",
+        "topEndInput",
+        "rateCoeffInput",
+        "rateFuelInput",
+        "rateVariableInput",
+        "rateFixedInput",
+        "rateSubscriptionInput"
+      ];
+
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener("input", saveOrlenState);
+        el.addEventListener("change", saveOrlenState);
+      });
+    }
+
 
     function updatePrintReport() {
       if (typeof getRaw !== "function") return;
@@ -2151,6 +2227,8 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
     }
 
     window.addEventListener("load", () => {
+      loadOrlenState();
+      attachOrlenAutosave();
       if (typeof updatePrintReport === "function") {
         updatePrintReport();
         setInterval(updatePrintReport, 500);
