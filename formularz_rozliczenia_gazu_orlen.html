@@ -1157,13 +1157,15 @@
     
     
     
+    
     @page {
       size: A4 portrait;
       margin: 6mm;
     }
 
     @media print {
-      html, body {
+      html,
+      body {
         margin: 0 !important;
         padding: 0 !important;
         background: #ffffff !important;
@@ -1172,45 +1174,118 @@
         print-color-adjust: exact !important;
       }
 
+      body {
+        width: 100% !important;
+        height: auto !important;
+      }
+
       .wrap,
       #entryPanel,
       #previewArea,
-      .formula-bar,
       .toolbar,
+      .formula-bar,
       .mobile-preview,
       .view-hint,
       .app-version,
       .update-toast,
-      .update-success-toast {
+      .update-success-toast,
+      #orlenPrintFrame {
         display: none !important;
         visibility: hidden !important;
+        width: 0 !important;
         height: 0 !important;
         min-height: 0 !important;
         max-height: 0 !important;
         overflow: hidden !important;
-      }
-
-      body > :not(#printReport) {
-        display: none !important;
-        visibility: hidden !important;
-        height: 0 !important;
-        overflow: hidden !important;
+        position: absolute !important;
+        left: -99999px !important;
+        top: -99999px !important;
       }
 
       #printReport {
         display: block !important;
         visibility: visible !important;
         width: 198mm !important;
-        max-width: 198mm !important;
+        height: 285mm !important;
+        max-height: 285mm !important;
         margin: 0 auto !important;
-        page-break-after: avoid !important;
+        padding: 0 !important;
+        overflow: hidden !important;
         page-break-inside: avoid !important;
+        page-break-after: avoid !important;
+      }
+
+      #printReport * {
+        visibility: visible !important;
+        box-sizing: border-box !important;
       }
 
       #printReport .pr-page {
         width: 198mm !important;
+        height: 285mm !important;
         min-height: 0 !important;
+        max-height: 285mm !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
         overflow: hidden !important;
+        page-break-inside: avoid !important;
+      }
+
+      #printReport .pr-header {
+        flex: 0 0 auto !important;
+        padding: 4.5mm !important;
+        margin: 0 0 3.5mm 0 !important;
+      }
+
+      #printReport .pr-grid {
+        flex: 1 1 auto !important;
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 3mm !important;
+        margin-top: 0 !important;
+        overflow: hidden !important;
+      }
+
+      #printReport .pr-card {
+        padding: 3mm !important;
+        border-radius: 3.5mm !important;
+        page-break-inside: avoid !important;
+      }
+
+      #printReport .pr-card h3 {
+        margin: 0 0 2mm 0 !important;
+        font-size: 10.5pt !important;
+      }
+
+      #printReport .pr-row {
+        font-size: 9pt !important;
+        padding: 0.55mm 0 !important;
+      }
+
+      #printReport .pr-summary-box {
+        padding: 2.3mm !important;
+      }
+
+      #printReport .pr-summary-box .value {
+        font-size: 14pt !important;
+      }
+
+      #printReport .pr-final {
+        flex: 0 0 auto !important;
+        margin-top: 3.5mm !important;
+        padding: 4mm !important;
+      }
+
+      #printReport .pr-final-value {
+        font-size: 26pt !important;
+      }
+
+      #printReport .pr-footer {
+        flex: 0 0 auto !important;
+        margin-top: 2.5mm !important;
+        font-size: 7.5pt !important;
       }
     }
   </style>
@@ -1314,7 +1389,7 @@
     </div>
     <div class="toolbar">
       <div class="note"></div>
-      <button type="button" onclick="printReportOnly()">Drukuj / zapisz PDF</button>
+      <button type="button" onclick="prepareAndPrintReport()">Drukuj / zapisz PDF</button>
       <button type="button" id="exitAppBtnPreview" class="exit-btn">Koniec</button>
 </div>
 
@@ -1495,7 +1570,7 @@
     </div>
   </section>
 
-  <div class="app-version" id="appVersion">ORLEN1025</div>
+  <div class="app-version" id="appVersion">ORLEN1026</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -1504,7 +1579,7 @@
   <div class="update-success-toast" id="updateSuccessToast">Uaktualniono do najnowszej wersji</div>
 
   <script>
-    const APP_VERSION = "ORLEN1025";
+    const APP_VERSION = "ORLEN1026";
 
     function normText(s) {
       return (s ?? "").toString().trim();
@@ -2261,45 +2336,14 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
 </html>`;
     }
 
-    function printReportOnly() {
+
+    function prepareAndPrintReport() {
       updatePrintReport();
-
-      const oldFrame = document.getElementById("orlenPrintFrame");
-      if (oldFrame) oldFrame.remove();
-
-      const iframe = document.createElement("iframe");
-      iframe.id = "orlenPrintFrame";
-      iframe.style.position = "fixed";
-      iframe.style.right = "0";
-      iframe.style.bottom = "0";
-      iframe.style.width = "0";
-      iframe.style.height = "0";
-      iframe.style.border = "0";
-      iframe.style.opacity = "0";
-      iframe.setAttribute("aria-hidden", "true");
-
-      document.body.appendChild(iframe);
-
-      const doc = iframe.contentWindow.document;
-      doc.open();
-      doc.write(buildPrintReportHtml());
-      doc.close();
-
-      iframe.onload = () => {
-        setTimeout(() => {
-          iframe.contentWindow.focus();
-          iframe.contentWindow.print();
-
-          setTimeout(() => {
-            iframe.remove();
-          }, 1500);
-        }, 350);
-      };
+      window.setTimeout(() => {
+        window.print();
+      }, 150);
     }
-      win.document.open();
-      win.document.write(buildPrintReportHtml());
-      win.document.close();
-    }
+
 
 </script>
 </body>
