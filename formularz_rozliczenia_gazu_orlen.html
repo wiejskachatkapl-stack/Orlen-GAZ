@@ -1694,7 +1694,7 @@
     </div>
   </section>
 
-  <div class="app-version" id="appVersion">ORLEN1063</div>
+  <div class="app-version" id="appVersion">ORLEN1039</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -1703,7 +1703,7 @@
   <div class="update-success-toast" id="updateSuccessToast">Uaktualniono do najnowszej wersji</div>
 
   <script>
-    const APP_VERSION = "ORLEN1063";
+    const APP_VERSION = "ORLEN1039";
 
     function normText(s) {
       return (s ?? "").toString().trim();
@@ -2029,172 +2029,6 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
       return Number(String(el.value).replace(",", "."));
     }
 
-
-    const ORLEN_PERSIST_KEY = "ORLEN_GAZ_FORM_VALUES";
-
-    function orlenGetPersistIds() {
-      return [
-        "dateFrom",
-        "dateTo",
-        "mainFrom",
-        "mainTo",
-        "topFrom",
-        "topTo",
-        "rateFactor",
-        "rateFuel",
-        "rateVariable",
-        "rateFixed",
-        "rateSubscription"
-      ];
-    }
-
-    function orlenPersistCollect() {
-      const data = {};
-      orlenGetPersistIds().forEach(id => {
-        const el = document.getElementById(id);
-        if (el) data[id] = el.value;
-      });
-      return data;
-    }
-
-    function orlenPersistSave() {
-      const data = orlenPersistCollect();
-      const raw = JSON.stringify(data);
-
-      try {
-        localStorage.setItem(ORLEN_PERSIST_KEY, raw);
-      } catch (err) {
-        try {
-          document.cookie = ORLEN_PERSIST_KEY + "=" + encodeURIComponent(raw) + "; max-age=31536000; path=/; SameSite=Lax";
-        } catch (err2) {}
-      }
-    }
-
-    function orlenPersistReadCookie() {
-      try {
-        const parts = document.cookie.split(";").map(v => v.trim());
-        const found = parts.find(v => v.startsWith(ORLEN_PERSIST_KEY + "="));
-        return found ? decodeURIComponent(found.substring(ORLEN_PERSIST_KEY.length + 1)) : "";
-      } catch (err) {
-        return "";
-      }
-    }
-
-    function orlenPersistLoadRaw() {
-      let raw = "";
-      try {
-        raw = localStorage.getItem(ORLEN_PERSIST_KEY) || "";
-      } catch (err) {}
-
-      if (!raw) raw = orlenPersistReadCookie();
-      return raw;
-    }
-
-    function orlenPersistApplyToInputs(data) {
-      if (!data || typeof data !== "object") return false;
-      let applied = false;
-
-      orlenGetPersistIds().forEach(id => {
-        const el = document.getElementById(id);
-        if (el && Object.prototype.hasOwnProperty.call(data, id)) {
-          el.value = data[id];
-          el.setAttribute("value", data[id]);
-          applied = true;
-        }
-      });
-
-      return applied;
-    }
-
-    function orlenPersistApplyToSheet() {
-      if (typeof setCell !== "function") return;
-
-      const dateFrom = document.getElementById("dateFrom")?.value || "";
-      const dateTo = document.getElementById("dateTo")?.value || "";
-
-      if (dateFrom && dateTo && typeof monthNameUpper === "function") {
-        setCell("F1", monthNameUpper(dateTo));
-        setCell("F2", yearFromDate(dateTo));
-        setCell("D4", formatDateShort(dateFrom));
-        setCell("E4", formatDateShort(dateTo));
-      }
-
-      const mainFrom = typeof readFormNumber === "function" ? readFormNumber("mainFrom") : NaN;
-      const mainTo = typeof readFormNumber === "function" ? readFormNumber("mainTo") : NaN;
-      const topFrom = typeof readFormNumber === "function" ? readFormNumber("topFrom") : NaN;
-      const topTo = typeof readFormNumber === "function" ? readFormNumber("topTo") : NaN;
-
-      if (Number.isFinite(mainFrom)) {
-        setCell("F5", mainFrom);
-        setCell("F7", mainFrom);
-      }
-
-      if (Number.isFinite(mainTo)) {
-        setCell("G5", mainTo);
-        setCell("G7", mainTo);
-      }
-
-      if (Number.isFinite(topFrom)) setCell("F8", topFrom);
-      if (Number.isFinite(topTo)) setCell("G8", topTo);
-
-      const factor = document.getElementById("rateFactor")?.value || "";
-      const fuel = document.getElementById("rateFuel")?.value || "";
-      const variable = document.getElementById("rateVariable")?.value || "";
-      const fixed = document.getElementById("rateFixed")?.value || "";
-      const subscription = document.getElementById("rateSubscription")?.value || "";
-
-      if (factor) {
-        setCell("J5", factor);
-        setCell("J7", factor);
-      }
-      if (fuel) setCell("L5", fuel);
-      if (variable) setCell("L7", variable);
-      if (fixed) {
-        setCell("L6", fixed);
-        setCell("M6", fixed);
-      }
-      if (subscription) {
-        setCell("L4", subscription);
-        setCell("M4", subscription);
-      }
-
-      if (typeof recalc === "function") recalc();
-      if (typeof updateMobileView === "function") updateMobileView();
-      if (typeof updatePrintReport === "function") updatePrintReport();
-    }
-
-    function orlenPersistLoad() {
-      const raw = orlenPersistLoadRaw();
-      if (!raw) return false;
-
-      try {
-        const data = JSON.parse(raw);
-        const applied = orlenPersistApplyToInputs(data);
-        if (applied) {
-          orlenPersistApplyToSheet();
-          setTimeout(orlenPersistApplyToSheet, 250);
-        }
-        return applied;
-      } catch (err) {
-        return false;
-      }
-    }
-
-    function orlenPersistInit() {
-      orlenPersistLoad();
-
-      orlenGetPersistIds().forEach(id => {
-        const el = document.getElementById(id);
-        if (!el || el.dataset.orlenPersistBound === "1") return;
-        el.dataset.orlenPersistBound = "1";
-        el.addEventListener("change", () => {
-          orlenPersistSave();
-          orlenPersistApplyToSheet();
-        });
-      });
-    }
-
-
     function applyEntryForm() {
       const dateFrom = document.getElementById("dateFrom").value;
       const dateTo = document.getElementById("dateTo").value;
@@ -2224,7 +2058,6 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
       setCell("F8", topFrom);
       setCell("G8", topTo);
 
-      orlenPersistSave();
       recalc();
       setCellEditableState(false);
       document.getElementById("entryPanel").style.display = "none";
@@ -2248,7 +2081,7 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
     });
     document.getElementById("exitAppBtn")?.addEventListener("click", exitApplication);
     document.getElementById("exitAppBtnPreview")?.addEventListener("click", exitApplication);
-    document.getElementById("updateRatesBtn").addEventListener("click", () => { updateRatesFromPanel(); orlenPersistSave(); });
+    document.getElementById("updateRatesBtn").addEventListener("click", updateRatesFromPanel);
     document.getElementById("closeRatesBtn")?.addEventListener("click", () => {
       const panel = document.getElementById("ratesPanel");
       if (panel) panel.classList.remove("open");
@@ -2318,7 +2151,6 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
     }
 
     window.addEventListener("load", () => {
-      if (typeof orlenPersistInit === "function") orlenPersistInit();
       if (typeof updatePrintReport === "function") {
         updatePrintReport();
         setInterval(updatePrintReport, 500);
