@@ -1,0 +1,1 @@
+Command '['node', '--check', '/mnt/data/ORLEN1034_work/formularz_rozliczenia_gazu_orlen.html.jscheck.js']' returned non-zero exit status 1.
