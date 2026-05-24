@@ -1,4 +1,5 @@
-const SW_VERSION = "ORLEN1062";
+const SW_VERSION = "ORLEN1063";
+const CACHE_NAME = "orlen-gaz-cache-ORLEN1063";
 
 self.addEventListener("install", event => {
   self.skipWaiting();
@@ -6,12 +7,12 @@ self.addEventListener("install", event => {
 
 self.addEventListener("activate", event => {
   event.waitUntil(
-    caches.keys()
-      .then(keys => Promise.all(keys.map(key => caches.delete(key))))
-      .then(() => self.clients.claim())
+    caches.keys().then(keys => Promise.all(keys.map(key => caches.delete(key)))).then(() => self.clients.claim())
   );
 });
 
 self.addEventListener("fetch", event => {
-  event.respondWith(fetch(event.request, { cache: "no-store" }));
+  event.respondWith(
+    fetch(event.request, { cache: "no-store" }).catch(() => caches.match(event.request))
+  );
 });
