@@ -1312,33 +1312,6 @@
     }
 
 
-
-    .save-toast-fixed {
-      position: fixed;
-      left: 50%;
-      top: 22px;
-      transform: translateX(-50%);
-      z-index: 99999;
-      display: none;
-      padding: 12px 18px;
-      border-radius: 999px;
-      background: #e8fff2;
-      color: #0a6b36;
-      font-weight: 900;
-      border: 1px solid #9fe0bb;
-      box-shadow: 0 10px 30px rgba(0,0,0,.18);
-    }
-    .manual-save-info {
-      display: none;
-      margin-left: 10px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: #e8fff2;
-      color: #0a6b36;
-      font-weight: 900;
-      border: 1px solid #9fe0bb;
-    }
-
     @page {
       size: A4 portrait;
       margin: 6mm;
@@ -1520,8 +1493,6 @@
       </div>
       <div class="form-actions">
         <button type="button" id="addReadingBtn">Dodaj</button>
-        <button type="button" id="manualSaveBtn" onclick="orlenAddSaveValues(); return false;">Zapisz</button>
-        <span id="manualSaveInfo" class="manual-save-info">Zapisano dane</span>
         <button type="button" id="changeRatesBtn">Zmień wartości</button>
                 <button type="button" id="exitAppBtn" class="exit-btn">Koniec</button>
 <span id="formError" class="error">Uzupełnij poprawnie wszystkie pola. Stan końcowy nie może być mniejszy od początkowego.</span>
@@ -1578,8 +1549,6 @@
     <div class="toolbar">
       <div class="note"></div>
       <button type="button" onclick="prepareAndPrintReport()">Drukuj / zapisz PDF</button>
-      <button type="button" id="manualSaveBtnPreview" onclick="orlenAddSaveValues(); return false;">Zapisz</button>
-      <span id="manualSaveInfoPreview" class="manual-save-info">Zapisano dane</span>
       <button type="button" id="exitAppBtnPreview" class="exit-btn">Koniec</button>
 </div>
 
@@ -1725,7 +1694,7 @@
     </div>
   </section>
 
-  <div class="app-version" id="appVersion">ORLEN1054</div>
+  <div class="app-version" id="appVersion">ORLEN1055</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -1734,7 +1703,7 @@
   <div class="update-success-toast" id="updateSuccessToast">Uaktualniono do najnowszej wersji</div>
 
   <script>
-    const APP_VERSION = "ORLEN1054";
+    const APP_VERSION = "ORLEN1055";
 
     function normText(s) {
       return (s ?? "").toString().trim();
@@ -2090,6 +2059,7 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
       setCell("G8", topTo);
 
       recalc();
+      orlenSaveAfterDodaj();
       setCellEditableState(false);
       document.getElementById("entryPanel").style.display = "none";
       document.getElementById("previewArea").style.display = "block";
@@ -2106,7 +2076,7 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
       });
     });
 
-    document.getElementById("addReadingBtn").addEventListener("click", () => { orlenAddSaveValues(); applyEntryForm(); });
+    document.getElementById("addReadingBtn").addEventListener("click", applyEntryForm);
     document.getElementById("changeRatesBtn").addEventListener("click", () => {
       document.getElementById("ratesPanel").classList.toggle("open");
     });
@@ -2125,9 +2095,8 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
   
 
 
-
-    const ORLEN_ADD_SAVE_KEY = "ORLEN_GAZ_DANE_PO_DODAJ";
-    const ORLEN_ADD_SAVE_FIELDS = [
+    const ORLEN_AUTO_SAVE_KEY = "ORLEN_GAZ_DANE_PO_DODAJ";
+    const ORLEN_AUTO_SAVE_FIELDS = [
       "dateFrom",
       "dateTo",
       "mainFrom",
@@ -2141,53 +2110,52 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
       "rateSubscription"
     ];
 
-    function orlenAddCollectValues() {
+    function orlenCollectFieldsForSave() {
       const data = {};
-      ORLEN_ADD_SAVE_FIELDS.forEach(id => {
+      ORLEN_AUTO_SAVE_FIELDS.forEach(id => {
         const el = document.getElementById(id);
         if (el) data[id] = el.value;
       });
       return data;
     }
 
-    function orlenAddSaveValues() {
-      const data = orlenAddCollectValues();
-      const raw = JSON.stringify(data);
+    function orlenSaveAfterDodaj() {
+      const raw = JSON.stringify(orlenCollectFieldsForSave());
 
       try {
-        localStorage.setItem(ORLEN_ADD_SAVE_KEY, raw);
+        localStorage.setItem(ORLEN_AUTO_SAVE_KEY, raw);
       } catch (err) {
         try {
-          document.cookie = ORLEN_ADD_SAVE_KEY + "=" + encodeURIComponent(raw) + "; max-age=31536000; path=/; SameSite=Lax";
+          document.cookie = ORLEN_AUTO_SAVE_KEY + "=" + encodeURIComponent(raw) + "; max-age=31536000; path=/; SameSite=Lax";
         } catch (cookieErr) {}
       }
     }
 
-    function orlenAddReadCookie() {
+    function orlenReadSavedCookie() {
       try {
         const parts = document.cookie.split(";").map(v => v.trim());
-        const found = parts.find(v => v.startsWith(ORLEN_ADD_SAVE_KEY + "="));
-        return found ? decodeURIComponent(found.substring(ORLEN_ADD_SAVE_KEY.length + 1)) : null;
+        const found = parts.find(v => v.startsWith(ORLEN_AUTO_SAVE_KEY + "="));
+        return found ? decodeURIComponent(found.substring(ORLEN_AUTO_SAVE_KEY.length + 1)) : null;
       } catch (err) {
         return null;
       }
     }
 
-    function orlenAddLoadValues() {
+    function orlenLoadSavedAfterStart() {
       let raw = null;
 
       try {
-        raw = localStorage.getItem(ORLEN_ADD_SAVE_KEY);
+        raw = localStorage.getItem(ORLEN_AUTO_SAVE_KEY);
       } catch (err) {
         raw = null;
       }
 
-      if (!raw) raw = orlenAddReadCookie();
+      if (!raw) raw = orlenReadSavedCookie();
       if (!raw) return;
 
       try {
         const data = JSON.parse(raw);
-        ORLEN_ADD_SAVE_FIELDS.forEach(id => {
+        ORLEN_AUTO_SAVE_FIELDS.forEach(id => {
           const el = document.getElementById(id);
           if (el && Object.prototype.hasOwnProperty.call(data, id)) {
             el.value = data[id];
@@ -2196,14 +2164,10 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
       } catch (err) {}
     }
 
-    function orlenAddInitLoad() {
-      orlenAddLoadValues();
-    }
-
     if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", orlenAddInitLoad);
+      document.addEventListener("DOMContentLoaded", orlenLoadSavedAfterStart);
     } else {
-      orlenAddInitLoad();
+      orlenLoadSavedAfterStart();
     }
 
 
@@ -2265,7 +2229,6 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
     }
 
     window.addEventListener("load", () => {
-      if (typeof orlenInitSaving === "function") orlenInitSaving();
       if (typeof updatePrintReport === "function") {
         updatePrintReport();
         setInterval(updatePrintReport, 500);
