@@ -1520,7 +1520,7 @@
       </div>
       <div class="form-actions">
         <button type="button" id="addReadingBtn">Dodaj</button>
-        <button type="button" id="manualSaveBtn" onclick="return orlenSaveNow();">Zapisz</button>
+        <button type="button" id="manualSaveBtn" onclick="orlenAddSaveValues(); return false;">Zapisz</button>
         <span id="manualSaveInfo" class="manual-save-info">Zapisano dane</span>
         <button type="button" id="changeRatesBtn">Zmień wartości</button>
                 <button type="button" id="exitAppBtn" class="exit-btn">Koniec</button>
@@ -1578,7 +1578,7 @@
     <div class="toolbar">
       <div class="note"></div>
       <button type="button" onclick="prepareAndPrintReport()">Drukuj / zapisz PDF</button>
-      <button type="button" id="manualSaveBtnPreview" onclick="return orlenSaveNow();">Zapisz</button>
+      <button type="button" id="manualSaveBtnPreview" onclick="orlenAddSaveValues(); return false;">Zapisz</button>
       <span id="manualSaveInfoPreview" class="manual-save-info">Zapisano dane</span>
       <button type="button" id="exitAppBtnPreview" class="exit-btn">Koniec</button>
 </div>
@@ -1725,7 +1725,7 @@
     </div>
   </section>
 
-  <div class="app-version" id="appVersion">ORLEN1053</div>
+  <div class="app-version" id="appVersion">ORLEN1054</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -1734,7 +1734,7 @@
   <div class="update-success-toast" id="updateSuccessToast">Uaktualniono do najnowszej wersji</div>
 
   <script>
-    const APP_VERSION = "ORLEN1053";
+    const APP_VERSION = "ORLEN1054";
 
     function normText(s) {
       return (s ?? "").toString().trim();
@@ -2106,7 +2106,7 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
       });
     });
 
-    document.getElementById("addReadingBtn").addEventListener("click", applyEntryForm);
+    document.getElementById("addReadingBtn").addEventListener("click", () => { orlenAddSaveValues(); applyEntryForm(); });
     document.getElementById("changeRatesBtn").addEventListener("click", () => {
       document.getElementById("ratesPanel").classList.toggle("open");
     });
@@ -2125,213 +2125,85 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
   
 
 
-    const ORLEN_SAVE_KEY = "ORLEN_GAZ_PERMANENT_VALUES";
-    const ORLEN_SAVE_FIELDS = [
-      "dateFrom", "dateTo", "mainFrom", "mainTo", "topFrom", "topTo",
-      "rateFactor", "rateFuel", "rateVariable", "rateFixed", "rateSubscription"
+
+    const ORLEN_ADD_SAVE_KEY = "ORLEN_GAZ_DANE_PO_DODAJ";
+    const ORLEN_ADD_SAVE_FIELDS = [
+      "dateFrom",
+      "dateTo",
+      "mainFrom",
+      "mainTo",
+      "topFrom",
+      "topTo",
+      "rateFactor",
+      "rateFuel",
+      "rateVariable",
+      "rateFixed",
+      "rateSubscription"
     ];
 
-    function orlenShowSaveToast(message, isOk = true) {
-      let toast = document.getElementById("orlenSaveToast");
-      if (!toast) {
-        toast = document.createElement("div");
-        toast.id = "orlenSaveToast";
-        toast.className = "save-toast-fixed";
-        document.body.appendChild(toast);
-      }
-
-      toast.textContent = message;
-      toast.style.display = "block";
-      toast.style.background = isOk ? "#e8fff2" : "#fff1d6";
-      toast.style.color = isOk ? "#0a6b36" : "#8a4b00";
-      toast.style.borderColor = isOk ? "#9fe0bb" : "#f3c46c";
-
-      ["manualSaveInfo", "manualSaveInfoPreview"].forEach(id => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        el.textContent = message;
-        el.style.display = "inline-block";
-        el.style.background = isOk ? "#e8fff2" : "#fff1d6";
-        el.style.color = isOk ? "#0a6b36" : "#8a4b00";
-        el.style.borderColor = isOk ? "#9fe0bb" : "#f3c46c";
-      });
-
-      window.setTimeout(() => {
-        toast.style.display = "none";
-        ["manualSaveInfo", "manualSaveInfoPreview"].forEach(id => {
-          const el = document.getElementById(id);
-          if (el) el.style.display = "none";
-        });
-      }, 2300);
-    }
-
-    function orlenReadFormValues() {
+    function orlenAddCollectValues() {
       const data = {};
-      ORLEN_SAVE_FIELDS.forEach(id => {
+      ORLEN_ADD_SAVE_FIELDS.forEach(id => {
         const el = document.getElementById(id);
         if (el) data[id] = el.value;
       });
       return data;
     }
 
-    function orlenWriteFormValues(data) {
-      if (!data || typeof data !== "object") return false;
-      let changed = false;
-
-      ORLEN_SAVE_FIELDS.forEach(id => {
-        const el = document.getElementById(id);
-        if (el && Object.prototype.hasOwnProperty.call(data, id)) {
-          el.value = data[id];
-          changed = true;
-        }
-      });
-
-      return changed;
-    }
-
-    function orlenStorageSet(key, value) {
-      try {
-        localStorage.setItem(key, value);
-        return true;
-      } catch (err) {
-        return false;
-      }
-    }
-
-    function orlenStorageGet(key) {
-      try {
-        return localStorage.getItem(key);
-      } catch (err) {
-        return null;
-      }
-    }
-
-    function orlenCookieSet(key, value) {
-      try {
-        document.cookie = key + "=" + encodeURIComponent(value) + "; max-age=31536000; path=/; SameSite=Lax";
-        return document.cookie.indexOf(key + "=") !== -1;
-      } catch (err) {
-        return false;
-      }
-    }
-
-    function orlenCookieGet(key) {
-      try {
-        const parts = document.cookie.split(";").map(v => v.trim());
-        const found = parts.find(v => v.startsWith(key + "="));
-        return found ? decodeURIComponent(found.substring(key.length + 1)) : null;
-      } catch (err) {
-        return null;
-      }
-    }
-
-    function orlenSaveNow() {
-      const data = orlenReadFormValues();
+    function orlenAddSaveValues() {
+      const data = orlenAddCollectValues();
       const raw = JSON.stringify(data);
 
-      const savedLocal = orlenStorageSet(ORLEN_SAVE_KEY, raw);
-      const savedCookie = savedLocal ? true : orlenCookieSet(ORLEN_SAVE_KEY, raw);
-
-      if (savedLocal || savedCookie) {
-        orlenShowSaveToast("Zapisano dane", true);
-      } else {
-        orlenShowSaveToast("Nie zapisano — pamięć przeglądarki zablokowana", false);
+      try {
+        localStorage.setItem(ORLEN_ADD_SAVE_KEY, raw);
+      } catch (err) {
+        try {
+          document.cookie = ORLEN_ADD_SAVE_KEY + "=" + encodeURIComponent(raw) + "; max-age=31536000; path=/; SameSite=Lax";
+        } catch (cookieErr) {}
       }
-
-      return false;
     }
 
-    function orlenLoadSavedValues() {
-      const raw = orlenStorageGet(ORLEN_SAVE_KEY) || orlenCookieGet(ORLEN_SAVE_KEY);
-      if (!raw) return false;
+    function orlenAddReadCookie() {
+      try {
+        const parts = document.cookie.split(";").map(v => v.trim());
+        const found = parts.find(v => v.startsWith(ORLEN_ADD_SAVE_KEY + "="));
+        return found ? decodeURIComponent(found.substring(ORLEN_ADD_SAVE_KEY.length + 1)) : null;
+      } catch (err) {
+        return null;
+      }
+    }
+
+    function orlenAddLoadValues() {
+      let raw = null;
+
+      try {
+        raw = localStorage.getItem(ORLEN_ADD_SAVE_KEY);
+      } catch (err) {
+        raw = null;
+      }
+
+      if (!raw) raw = orlenAddReadCookie();
+      if (!raw) return;
 
       try {
         const data = JSON.parse(raw);
-        const loaded = orlenWriteFormValues(data);
-        if (loaded && typeof orlenApplyValuesToSheet === "function") {
-          orlenApplyValuesToSheet();
-        }
-        return loaded;
-      } catch (err) {
-        return false;
-      }
+        ORLEN_ADD_SAVE_FIELDS.forEach(id => {
+          const el = document.getElementById(id);
+          if (el && Object.prototype.hasOwnProperty.call(data, id)) {
+            el.value = data[id];
+          }
+        });
+      } catch (err) {}
     }
 
-    function orlenApplyValuesToSheet() {
-      if (typeof setCell !== "function") return;
-
-      const dateFrom = document.getElementById("dateFrom")?.value || "";
-      const dateTo = document.getElementById("dateTo")?.value || "";
-
-      if (dateFrom && dateTo) {
-        setCell("F1", monthNameUpper(dateTo));
-        setCell("F2", yearFromDate(dateTo));
-        setCell("D4", formatDateShort(dateFrom));
-        setCell("E4", formatDateShort(dateTo));
-      }
-
-      const mainFrom = readFormNumber("mainFrom");
-      const mainTo = readFormNumber("mainTo");
-      const topFrom = readFormNumber("topFrom");
-      const topTo = readFormNumber("topTo");
-
-      if (Number.isFinite(mainFrom)) {
-        setCell("F5", mainFrom);
-        setCell("F7", mainFrom);
-      }
-      if (Number.isFinite(mainTo)) {
-        setCell("G5", mainTo);
-        setCell("G7", mainTo);
-      }
-      if (Number.isFinite(topFrom)) setCell("F8", topFrom);
-      if (Number.isFinite(topTo)) setCell("G8", topTo);
-
-      const factor = document.getElementById("rateFactor")?.value || "";
-      const fuel = document.getElementById("rateFuel")?.value || "";
-      const variable = document.getElementById("rateVariable")?.value || "";
-      const fixed = document.getElementById("rateFixed")?.value || "";
-      const subscription = document.getElementById("rateSubscription")?.value || "";
-
-      if (factor) {
-        setCell("J5", factor);
-        setCell("J7", factor);
-      }
-      if (fuel) setCell("L5", fuel);
-      if (variable) setCell("L7", variable);
-      if (fixed) {
-        setCell("L6", fixed);
-        setCell("M6", fixed);
-      }
-      if (subscription) {
-        setCell("L4", subscription);
-        setCell("M4", subscription);
-      }
-
-      if (typeof recalc === "function") recalc();
-      if (typeof updateMobileView === "function") updateMobileView();
-      if (typeof updatePrintReport === "function") updatePrintReport();
+    function orlenAddInitLoad() {
+      orlenAddLoadValues();
     }
-
-    function orlenInitSaving() {
-      orlenLoadSavedValues();
-
-      ORLEN_SAVE_FIELDS.forEach(id => {
-        const el = document.getElementById(id);
-        if (!el || el.dataset.orlenSavingBound === "1") return;
-        el.dataset.orlenSavingBound = "1";
-        el.addEventListener("change", orlenApplyValuesToSheet);
-        el.addEventListener("input", orlenApplyValuesToSheet);
-      });
-    }
-
-    window.orlenSaveNow = orlenSaveNow;
-    window.orlenLoadSavedValues = orlenLoadSavedValues;
-    window.orlenInitSaving = orlenInitSaving;
 
     if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", orlenInitSaving);
+      document.addEventListener("DOMContentLoaded", orlenAddInitLoad);
     } else {
-      orlenInitSaving();
+      orlenAddInitLoad();
     }
 
 
