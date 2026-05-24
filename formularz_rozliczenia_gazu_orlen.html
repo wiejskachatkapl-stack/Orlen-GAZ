@@ -1316,20 +1316,12 @@
     .manual-save-info {
       display: none;
       margin-left: 10px;
-      padding: 9px 12px;
+      padding: 8px 12px;
       border-radius: 999px;
-      background: #e7fff2;
+      background: #e8fff2;
       color: #0a6b36;
-      font-weight: 800;
+      font-weight: 900;
       border: 1px solid #9fe0bb;
-    }
-
-    .manual-save-preview {
-      display: inline-flex;
-    }
-
-    .manual-save-preview.show-save {
-      display: inline-flex !important;
     }
 
     @page {
@@ -1514,7 +1506,7 @@
       <div class="form-actions">
         <button type="button" id="addReadingBtn">Dodaj</button>
         <button type="button" id="manualSaveBtn">Zapisz</button>
-        <span id="manualSaveInfo" class="manual-save-info">Zapisano ostatnie dane</span>
+        <span id="manualSaveInfo" class="manual-save-info">Zapisano</span>
         <button type="button" id="changeRatesBtn">Zmień wartości</button>
                 <button type="button" id="exitAppBtn" class="exit-btn">Koniec</button>
 <span id="formError" class="error">Uzupełnij poprawnie wszystkie pola. Stan końcowy nie może być mniejszy od początkowego.</span>
@@ -1570,8 +1562,8 @@
     </div>
     <div class="toolbar">
       <div class="note"></div>
-      <button type="button" onclick="prepareAndPrintReport()" id="printPdfBtn">Drukuj / zapisz PDF</button>
-      <button type="button" id="manualSaveBtnPreview" class="manual-save-preview">Zapisz</button>
+      <button type="button" onclick="prepareAndPrintReport()">Drukuj / zapisz PDF</button>
+      <button type="button" id="manualSaveBtnPreview">Zapisz</button>
       <button type="button" id="exitAppBtnPreview" class="exit-btn">Koniec</button>
 </div>
 
@@ -1717,7 +1709,7 @@
     </div>
   </section>
 
-  <div class="app-version" id="appVersion">ORLEN1046</div>
+  <div class="app-version" id="appVersion">ORLEN1047</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -1726,7 +1718,7 @@
   <div class="update-success-toast" id="updateSuccessToast">Uaktualniono do najnowszej wersji</div>
 
   <script>
-    const APP_VERSION = "ORLEN1046";
+    const APP_VERSION = "ORLEN1047";
 
     function normText(s) {
       return (s ?? "").toString().trim();
@@ -2098,13 +2090,13 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
       });
     });
 
-    document.getElementById("addReadingBtn").addEventListener("click", () => { orlenSaveInputs(); applyEntryForm(); orlenSaveInputs(); });
+    document.getElementById("addReadingBtn").addEventListener("click", applyEntryForm);
     document.getElementById("changeRatesBtn").addEventListener("click", () => {
       document.getElementById("ratesPanel").classList.toggle("open");
     });
     document.getElementById("exitAppBtn")?.addEventListener("click", exitApplication);
     document.getElementById("exitAppBtnPreview")?.addEventListener("click", exitApplication);
-    document.getElementById("updateRatesBtn").addEventListener("click", () => { orlenSaveInputs(); updateRatesFromPanel(); orlenSaveInputs(); });
+    document.getElementById("updateRatesBtn").addEventListener("click", updateRatesFromPanel);
     document.getElementById("closeRatesBtn")?.addEventListener("click", () => {
       const panel = document.getElementById("ratesPanel");
       if (panel) panel.classList.remove("open");
@@ -2117,9 +2109,8 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
   
 
 
-
-    const ORLEN_MANUAL_SAVE_KEY = "ORLEN_GAZ_MANUAL_SAVE_1046";
-    const ORLEN_MANUAL_SAVE_IDS = [
+    const ORLEN_MANUAL_SAVE_KEY = "ORLEN_GAZ_LAST_MANUAL_SAVE_1047";
+    const ORLEN_MANUAL_FIELDS = [
       "dateFrom",
       "dateTo",
       "mainFrom",
@@ -2133,126 +2124,59 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
       "rateSubscription"
     ];
 
-    function orlenManualSave() {
+    function orlenManualSaveValues() {
       try {
         const data = {};
-        ORLEN_MANUAL_SAVE_IDS.forEach(id => {
+        ORLEN_MANUAL_FIELDS.forEach(id => {
           const el = document.getElementById(id);
           if (el) data[id] = el.value;
         });
+
         localStorage.setItem(ORLEN_MANUAL_SAVE_KEY, JSON.stringify(data));
 
-        const msg = document.getElementById("manualSaveInfo");
-        if (msg) {
-          msg.textContent = "Zapisano ostatnie dane";
-          msg.style.display = "inline-block";
+        const info = document.getElementById("manualSaveInfo");
+        if (info) {
+          info.textContent = "Zapisano";
+          info.style.display = "inline-block";
           setTimeout(() => {
-            msg.style.display = "none";
-          }, 2200);
+            info.style.display = "none";
+          }, 1800);
         }
       } catch (err) {
         alert("Nie udało się zapisać danych.");
       }
     }
 
-    function orlenManualLoad() {
+    function orlenManualLoadValues() {
       try {
         const raw = localStorage.getItem(ORLEN_MANUAL_SAVE_KEY);
         if (!raw) return;
 
         const data = JSON.parse(raw);
-        ORLEN_MANUAL_SAVE_IDS.forEach(id => {
+
+        ORLEN_MANUAL_FIELDS.forEach(id => {
           const el = document.getElementById(id);
           if (el && Object.prototype.hasOwnProperty.call(data, id)) {
             el.value = data[id];
           }
         });
-
-        if (typeof orlenApplySavedValuesToTemplate === "function") {
-          orlenApplySavedValuesToTemplate();
-        }
       } catch (err) {
         console.warn("Nie udało się wczytać zapisanych danych.", err);
       }
     }
 
-    function orlenApplySavedValuesToTemplate() {
-      if (typeof setCell !== "function") return;
+    function orlenInitManualSave() {
+      orlenManualLoadValues();
 
-      const dateFrom = document.getElementById("dateFrom")?.value || "";
-      const dateTo = document.getElementById("dateTo")?.value || "";
-
-      if (dateFrom && dateTo) {
-        setCell("F1", monthNameUpper(dateTo));
-        setCell("F2", yearFromDate(dateTo));
-        setCell("D4", formatDateShort(dateFrom));
-        setCell("E4", formatDateShort(dateTo));
+      const saveBtn = document.getElementById("manualSaveBtn");
+      if (saveBtn) {
+        saveBtn.addEventListener("click", orlenManualSaveValues);
       }
 
-      const mainFrom = readFormNumber("mainFrom");
-      const mainTo = readFormNumber("mainTo");
-      const topFrom = readFormNumber("topFrom");
-      const topTo = readFormNumber("topTo");
-
-      if (Number.isFinite(mainFrom)) {
-        setCell("F5", mainFrom);
-        setCell("F7", mainFrom);
+      const savePreviewBtn = document.getElementById("manualSaveBtnPreview");
+      if (savePreviewBtn) {
+        savePreviewBtn.addEventListener("click", orlenManualSaveValues);
       }
-      if (Number.isFinite(mainTo)) {
-        setCell("G5", mainTo);
-        setCell("G7", mainTo);
-      }
-      if (Number.isFinite(topFrom)) setCell("F8", topFrom);
-      if (Number.isFinite(topTo)) setCell("G8", topTo);
-
-      const factor = document.getElementById("rateFactor")?.value || "";
-      const fuel = document.getElementById("rateFuel")?.value || "";
-      const variable = document.getElementById("rateVariable")?.value || "";
-      const fixed = document.getElementById("rateFixed")?.value || "";
-      const subscription = document.getElementById("rateSubscription")?.value || "";
-
-      if (factor) {
-        setCell("J5", factor);
-        setCell("J7", factor);
-      }
-      if (fuel) setCell("L5", fuel);
-      if (variable) setCell("L7", variable);
-      if (fixed) {
-        setCell("L6", fixed);
-        setCell("M6", fixed);
-      }
-      if (subscription) {
-        setCell("L4", subscription);
-        setCell("M4", subscription);
-      }
-
-      if (typeof recalc === "function") recalc();
-      if (typeof updateMobileView === "function") updateMobileView();
-      if (typeof updatePrintReport === "function") updatePrintReport();
-    }
-
-    function orlenInitManualSaveButton() {
-      orlenManualLoad();
-
-      document.getElementById("manualSaveBtn")?.addEventListener("click", () => {
-        orlenApplySavedValuesToTemplate();
-        orlenManualSave();
-      });
-
-      document.getElementById("manualSaveBtnPreview")?.addEventListener("click", () => {
-        orlenApplySavedValuesToTemplate();
-        orlenManualSave();
-      });
-
-      document.getElementById("addReadingBtn")?.addEventListener("click", () => {
-        setTimeout(() => {
-          document.getElementById("manualSaveBtnPreview")?.classList.add("show-save");
-        }, 300);
-      });
-
-      document.getElementById("printPdfBtn")?.addEventListener("click", () => {
-        document.getElementById("manualSaveBtnPreview")?.classList.add("show-save");
-      });
     }
 
 
@@ -2314,7 +2238,7 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
     }
 
     window.addEventListener("load", () => {
-      orlenInitManualSaveButton();
+      orlenInitManualSave();
       if (typeof updatePrintReport === "function") {
         updatePrintReport();
         setInterval(updatePrintReport, 500);
@@ -2322,8 +2246,6 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
     });
 
     function prepareAndPrintReport() {
-      if (typeof orlenApplySavedValuesToTemplate === "function") orlenApplySavedValuesToTemplate();
-      if (typeof orlenManualSave === "function") orlenManualSave();
       if (typeof updatePrintReport === "function") {
         updatePrintReport();
       }
