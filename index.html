@@ -1728,7 +1728,7 @@
     </div>
   </section>
 
-  <div class="app-version" id="appVersion">ORLEN1037</div>
+  <div class="app-version" id="appVersion">ORLEN1038</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -1737,7 +1737,7 @@
   <div class="update-success-toast" id="updateSuccessToast">Uaktualniono do najnowszej wersji</div>
 
   <script>
-    const APP_VERSION = "ORLEN1037";
+    const APP_VERSION = "ORLEN1038";
 
     function normText(s) {
       return (s ?? "").toString().trim();
@@ -2126,6 +2126,7 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
     showUpdateSuccessIfNeeded();
     registerAutoUpdate();
   
+
     function updatePrintReport() {
       if (typeof getRaw !== "function") return;
 
@@ -2184,346 +2185,20 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
     }
 
     window.addEventListener("load", () => {
-      updatePrintReport();
-      setInterval(updatePrintReport, 500);
+      if (typeof updatePrintReport === "function") {
+        updatePrintReport();
+        setInterval(updatePrintReport, 500);
+      }
     });
 
-
-    function escapeHtml(value) {
-      return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;");
-    }
-
-    function buildPrintReportHtml() {
-      updatePrintReport();
-
-      const report = document.getElementById("printReport");
-      const reportInner = report ? report.innerHTML : "";
-
-      const printCss = `
-        @page { size: A4 portrait; margin: 7mm; }
-        html, body {
-          margin: 0;
-          padding: 0;
-          background: #ffffff;
-          font-family: Arial, Helvetica, sans-serif;
-          -webkit-print-color-adjust: exact;
-          print-color-adjust: exact;
-        }
-        * { box-sizing: border-box; }
-
-        .print-shell {
-          width: 196mm;
-          margin: 0 auto;
-          transform: scale(0.96);
-          transform-origin: top center;
-        }
-
-        .orlen-mark {
-          position: relative;
-          width: 12mm;
-          height: 12mm;
-          border-radius: 3.5mm;
-          background: #e1261c;
-          flex: 0 0 12mm;
-          box-shadow: 0 2mm 5mm rgba(0,0,0,.08);
-          overflow: hidden;
-        }
-        .orlen-mark::before {
-          content: "";
-          position: absolute;
-          left: 1.3mm;
-          top: 2.2mm;
-          width: 7mm;
-          height: 2.6mm;
-          background: #ffffff;
-          border-radius: 2mm 3mm 1.2mm 1.2mm;
-          transform: rotate(-8deg);
-        }
-        .orlen-mark::after {
-          content: "";
-          position: absolute;
-          right: 1.3mm;
-          bottom: 1.4mm;
-          width: 4.2mm;
-          height: 4.2mm;
-          border: 1.4mm solid #ffffff;
-          border-top-color: transparent;
-          border-left-color: transparent;
-          border-radius: 50%;
-          transform: rotate(28deg);
-        }
-
-        #printReport {
-          display: block !important;
-          width: 100%;
-        }
-
-        #printReport .pr-page {
-          width: 100%;
-          color: #0b2d52;
-        }
-
-        #printReport .pr-header {
-          display: grid;
-          grid-template-columns: 1.15fr 1fr 0.88fr;
-          align-items: center;
-          gap: 2.5mm;
-          background: linear-gradient(135deg, #0b2d52 0%, #1f5c93 100%);
-          color: #ffffff;
-          border-radius: 4.5mm;
-          padding: 4.2mm;
-          box-shadow: 0 2mm 6mm rgba(11,45,82,.10);
-        }
-
-        #printReport .pr-brand {
-          display: flex;
-          align-items: center;
-          gap: 3.2mm;
-        }
-
-        #printReport .pr-brand .orlen-mark {
-          box-shadow: none;
-        }
-
-        #printReport .pr-brand-title {
-          font-size: 17pt;
-          font-weight: 900;
-          line-height: 1;
-          letter-spacing: .3px;
-        }
-
-        #printReport .pr-brand-title .gaz {
-          display: inline-block;
-          margin-left: 2mm;
-          padding: 1mm 2.2mm;
-          border-radius: 4mm;
-          font-size: 10pt;
-          background: rgba(255,255,255,.18);
-          border: 1px solid rgba(255,255,255,.22);
-        }
-
-        #printReport .pr-brand-sub {
-          margin-top: 1.5mm;
-          font-size: 8.5pt;
-          color: rgba(255,255,255,.90);
-        }
-
-        #printReport .pr-period-box {
-          text-align: center;
-          background: rgba(255,255,255,.10);
-          border: 1px solid rgba(255,255,255,.18);
-          border-radius: 3.6mm;
-          padding: 2.4mm;
-        }
-
-        #printReport .pr-period-label {
-          font-size: 8.2pt;
-          letter-spacing: .4px;
-          text-transform: uppercase;
-          opacity: .92;
-          margin-bottom: 1mm;
-        }
-
-        #printReport .pr-period-value {
-          font-size: 18pt;
-          font-weight: 900;
-          line-height: 1.1;
-        }
-
-        #printReport .pr-period-dates {
-          margin-top: 1.1mm;
-          font-size: 8.5pt;
-          opacity: .95;
-        }
-
-        #printReport .pr-logo-box {
-          display: flex;
-          justify-content: flex-end;
-        }
-
-        #printReport .pr-logo-box .brand-side-logo {
-          width: 42mm;
-          height: 18mm;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: #ffffff;
-          border-radius: 3.4mm;
-          padding: 2mm;
-          box-shadow: none;
-        }
-
-        #printReport .pr-logo-box .brand-side-logo img {
-          width: 100%;
-          height: 100%;
-          object-fit: contain;
-          display: block;
-        }
-
-        #printReport .pr-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 2.5mm;
-          margin-top: 2.2mm;
-        }
-
-        #printReport .pr-card {
-          background: #ffffff;
-          border: 1px solid #d7e5f3;
-          border-radius: 3.5mm;
-          padding: 2.0mm;
-          box-shadow: 0 1.4mm 3.5mm rgba(11,45,82,.05);
-          page-break-inside: avoid;
-        }
-
-        #printReport .pr-card h3 {
-          display: block;
-          margin: -2.2mm -2.2mm 2mm -2.2mm;
-          padding: 1.5mm 2.2mm;
-          font-size: 10.6pt;
-          color: #ffffff;
-          background: #16acec;
-          border-bottom: 0;
-          border-radius: 3mm 3mm 0 0;
-          box-shadow: inset 0 -1px 0 rgba(255,255,255,.18);
-        }
-
-        #printReport .pr-rows {
-          display: grid;
-          gap: 1mm;
-        }
-
-        #printReport .pr-row {
-          display: flex;
-          justify-content: space-between;
-          align-items: baseline;
-          gap: 2.5mm;
-          font-size: 8.1pt;
-          padding: .45mm 0;
-          border-bottom: 1px dashed #e4eef7;
-        }
-
-        #printReport .pr-row:last-child {
-          border-bottom: 0;
-        }
-
-        #printReport .pr-row span:first-child {
-          color: #4c6480;
-          font-weight: 600;
-        }
-
-        #printReport .pr-row span:last-child {
-          color: #0b2d52;
-          font-weight: 800;
-          text-align: right;
-        }
-
-        #printReport .pr-summary {
-          grid-column: 1 / -1;
-          background: linear-gradient(180deg, #f6fbff 0%, #eef6fd 100%);
-        }
-
-        #printReport .pr-summary-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 2.4mm;
-          margin-top: .8mm;
-        }
-
-        #printReport .pr-summary-box {
-          border-radius: 3mm;
-          padding: 2.3mm;
-          background: #ffffff;
-          border: 1px solid #dbe8f4;
-          text-align: center;
-        }
-
-        #printReport .pr-summary-box .label {
-          font-size: 8.2pt;
-          color: #56708e;
-          text-transform: uppercase;
-          margin-bottom: 1.1mm;
-          font-weight: 700;
-        }
-
-        #printReport .pr-summary-box .value {
-          font-size: 13.5pt;
-          color: #0b2d52;
-          font-weight: 900;
-        }
-
-        #printReport .pr-final {
-          margin-top: 2.2mm;
-          background: linear-gradient(135deg, #0b2d52 0%, #1f5c93 100%);
-          color: #ffffff;
-          border-radius: 4.5mm;
-          padding: 2.7mm;
-          text-align: center;
-          box-shadow: 0 2mm 6mm rgba(11,45,82,.12);
-        }
-
-        #printReport .pr-final-label {
-          font-size: 10pt;
-          text-transform: uppercase;
-          letter-spacing: .4px;
-          margin-bottom: 1.6mm;
-          opacity: .96;
-          font-weight: 700;
-        }
-
-        #printReport .pr-final-value {
-          font-size: 25pt;
-          font-weight: 900;
-          line-height: 1;
-        }
-
-        #printReport .pr-footer {
-          margin-top: 2.2mm;
-          display: flex;
-          justify-content: space-between;
-          color: #56708e;
-          font-size: 7.8pt;
-          padding: 0 1mm;
-        }
-      `;
-
-      return `<!DOCTYPE html>
-<html lang="pl">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Raport ORLEN GAZ</title>
-<style>${printCss}</style>
-</head>
-<body>
-  <div class="print-shell">
-    <section id="printReport">${reportInner}</section>
-  </div>
-  <script>
-    window.onload = function() {
-      setTimeout(function() {
-        window.focus();
-        window.print();
-      }, 250);
-    };
-  <\/script>
-</body>
-</html>`;
-    }
-
-
     function prepareAndPrintReport() {
-      updatePrintReport();
+      if (typeof updatePrintReport === "function") {
+        updatePrintReport();
+      }
       window.setTimeout(() => {
         window.print();
       }, 150);
-    }, 150);
     }
-
 
 </script>
 </body>
