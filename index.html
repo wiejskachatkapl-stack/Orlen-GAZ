@@ -950,18 +950,18 @@
       display: grid;
       grid-template-columns: 1.2fr 1fr 0.9fr;
       align-items: center;
-      gap: 3mm;
+      gap: 2.5mm;
       background: linear-gradient(135deg, #0b2d52 0%, #1f5c93 100%);
       color: #fff;
       border-radius: 5mm;
-      padding: 3mm;
+      padding: 2.7mm;
       box-shadow: 0 3mm 8mm rgba(11,45,82,.12);
     }
 
     #printReport .pr-brand {
       display: flex;
       align-items: center;
-      gap: 3mm;
+      gap: 2.5mm;
     }
 
     #printReport .pr-brand .orlen-mark {
@@ -987,7 +987,7 @@
 
     #printReport .pr-brand-sub {
       margin-top: 1.2mm;
-      font-size: 8.4pt;
+      font-size: 8.1pt;
       color: rgba(255,255,255,.9);
     }
 
@@ -996,11 +996,11 @@
       background: rgba(255,255,255,.10);
       border: 1px solid rgba(255,255,255,.18);
       border-radius: 4mm;
-      padding: 2.2mm;
+      padding: 2.0mm;
     }
 
     #printReport .pr-period-label {
-      font-size: 8.4pt;
+      font-size: 8.1pt;
       letter-spacing: .5px;
       text-transform: uppercase;
       opacity: .9;
@@ -1016,7 +1016,7 @@
 
     #printReport .pr-period-dates {
       margin-top: 1.5mm;
-      font-size: 8.4pt;
+      font-size: 8.1pt;
       opacity: .95;
     }
 
@@ -1035,15 +1035,15 @@
     #printReport .pr-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 3mm;
-      margin-top: 3mm;
+      gap: 2.5mm;
+      margin-top: 2.2mm;
     }
 
     #printReport .pr-card {
       background: #ffffff;
       border: 1px solid #d7e5f3;
       border-radius: 4mm;
-      padding: 3mm;
+      padding: 2.7mm;
       box-shadow: 0 2mm 5mm rgba(11,45,82,.06);
     }
 
@@ -1064,7 +1064,7 @@
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      gap: 3mm;
+      gap: 2.5mm;
       font-size: 10pt;
       padding: .5mm 0;
       border-bottom: 1px dashed #e4eef7;
@@ -1093,7 +1093,7 @@
     #printReport .pr-summary-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 3mm;
+      gap: 2.5mm;
       margin-top: 1mm;
     }
 
@@ -1106,7 +1106,7 @@
     }
 
     #printReport .pr-summary-box .label {
-      font-size: 8.4pt;
+      font-size: 8.1pt;
       color: #56708e;
       text-transform: uppercase;
       margin-bottom: 1.5mm;
@@ -1235,56 +1235,61 @@
 
       #printReport .pr-header {
         flex: 0 0 auto !important;
-        padding: 3.2mm !important;
-        margin: 0 0 2.2mm 0 !important;
+        padding: 2.9mm !important;
+        margin: 0 0 1.8mm 0 !important;
       }
 
       #printReport .pr-grid {
         flex: 1 1 auto !important;
         display: grid !important;
         grid-template-columns: 1fr 1fr !important;
-        gap: 2.2mm !important;
+        gap: 2mm !important;
         margin-top: 0 !important;
         overflow: hidden !important;
       }
 
       #printReport .pr-card {
-        padding: 2.2mm !important;
+        padding: 2.0mm !important;
         border-radius: 3mm !important;
         page-break-inside: avoid !important;
       }
 
       #printReport .pr-card h3 {
-        margin: 0 0 2mm 0 !important;
-        font-size: 9.6pt !important;
+        display: block !important;
+        margin: -2.2mm -2.2mm 1.6mm -2.2mm !important;
+        padding: 1.2mm 2mm !important;
+        font-size: 9.2pt !important;
+        color: #ffffff !important;
+        background: #16acec !important;
+        border-radius: 3mm 3mm 0 0 !important;
       }
 
       #printReport .pr-row {
-        font-size: 8.4pt !important;
-        padding: 0.3mm 0 !important;
+        font-size: 8.1pt !important;
+        padding: 0.2mm 0 !important;
       }
 
       #printReport .pr-summary-box {
-        padding: 1.8mm !important;
+        padding: 1.6mm !important;
       }
 
       #printReport .pr-summary-box .value {
-        font-size: 12.8pt !important;
+        font-size: 12.2pt !important;
       }
 
       #printReport .pr-final {
         flex: 0 0 auto !important;
-        margin-top: 2.4mm !important;
-        padding: 3mm !important;
+        margin-top: 2mm !important;
+        padding: 2.7mm !important;
       }
 
       #printReport .pr-final-value {
-        font-size: 22pt !important;
+        font-size: 21pt !important;
       }
 
       #printReport .pr-footer {
         flex: 0 0 auto !important;
-        margin-top: 1.5mm !important;
+        margin-top: 1.2mm !important;
         font-size: 7pt !important;
       }
     }
@@ -1570,7 +1575,7 @@
     </div>
   </section>
 
-  <div class="app-version" id="appVersion">ORLEN1027</div>
+  <div class="app-version" id="appVersion">ORLEN1028</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -1579,7 +1584,7 @@
   <div class="update-success-toast" id="updateSuccessToast">Uaktualniono do najnowszej wersji</div>
 
   <script>
-    const APP_VERSION = "ORLEN1027";
+    const APP_VERSION = "ORLEN1028";
 
     function normText(s) {
       return (s ?? "").toString().trim();
@@ -2045,6 +2050,8 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
         .print-shell {
           width: 196mm;
           margin: 0 auto;
+          transform: scale(0.96);
+          transform-origin: top center;
         }
 
         .orlen-mark {
@@ -2096,7 +2103,7 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
           display: grid;
           grid-template-columns: 1.15fr 1fr 0.88fr;
           align-items: center;
-          gap: 3mm;
+          gap: 2.5mm;
           background: linear-gradient(135deg, #0b2d52 0%, #1f5c93 100%);
           color: #ffffff;
           border-radius: 4.5mm;
@@ -2192,25 +2199,29 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
         #printReport .pr-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 3mm;
-          margin-top: 3mm;
+          gap: 2.5mm;
+          margin-top: 2.2mm;
         }
 
         #printReport .pr-card {
           background: #ffffff;
           border: 1px solid #d7e5f3;
           border-radius: 3.5mm;
-          padding: 2.2mm;
+          padding: 2.0mm;
           box-shadow: 0 1.4mm 3.5mm rgba(11,45,82,.05);
           page-break-inside: avoid;
         }
 
         #printReport .pr-card h3 {
-          margin: 0 0 2.1mm 0;
-          font-size: 10.8pt;
-          color: #123d6b;
-          padding-bottom: 1.6mm;
-          border-bottom: 1px solid #dce9f5;
+          display: block;
+          margin: -2.2mm -2.2mm 2mm -2.2mm;
+          padding: 1.5mm 2.2mm;
+          font-size: 10.6pt;
+          color: #ffffff;
+          background: #16acec;
+          border-bottom: 0;
+          border-radius: 3mm 3mm 0 0;
+          box-shadow: inset 0 -1px 0 rgba(255,255,255,.18);
         }
 
         #printReport .pr-rows {
@@ -2222,9 +2233,9 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
           display: flex;
           justify-content: space-between;
           align-items: baseline;
-          gap: 3mm;
-          font-size: 8.4pt;
-          padding: .65mm 0;
+          gap: 2.5mm;
+          font-size: 8.1pt;
+          padding: .45mm 0;
           border-bottom: 1px dashed #e4eef7;
         }
 
@@ -2257,7 +2268,7 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
 
         #printReport .pr-summary-box {
           border-radius: 3mm;
-          padding: 2.8mm;
+          padding: 2.3mm;
           background: #ffffff;
           border: 1px solid #dbe8f4;
           text-align: center;
@@ -2272,17 +2283,17 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
         }
 
         #printReport .pr-summary-box .value {
-          font-size: 14.2pt;
+          font-size: 13.5pt;
           color: #0b2d52;
           font-weight: 900;
         }
 
         #printReport .pr-final {
-          margin-top: 3mm;
+          margin-top: 2.2mm;
           background: linear-gradient(135deg, #0b2d52 0%, #1f5c93 100%);
           color: #ffffff;
           border-radius: 4.5mm;
-          padding: 3mm;
+          padding: 2.7mm;
           text-align: center;
           box-shadow: 0 2mm 6mm rgba(11,45,82,.12);
         }
@@ -2297,13 +2308,13 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
         }
 
         #printReport .pr-final-value {
-          font-size: 27pt;
+          font-size: 25pt;
           font-weight: 900;
           line-height: 1;
         }
 
         #printReport .pr-footer {
-          margin-top: 3mm;
+          margin-top: 2.2mm;
           display: flex;
           justify-content: space-between;
           color: #56708e;
