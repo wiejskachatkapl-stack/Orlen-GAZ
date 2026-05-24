@@ -1156,14 +1156,14 @@
 
     
     
+    
     @page {
       size: A4 portrait;
       margin: 6mm;
     }
 
     @media print {
-      html,
-      body {
+      html, body {
         margin: 0 !important;
         padding: 0 !important;
         background: #ffffff !important;
@@ -1172,15 +1172,11 @@
         print-color-adjust: exact !important;
       }
 
-      body > *:not(#printReport) {
-        display: none !important;
-      }
-
       .wrap,
       #entryPanel,
       #previewArea,
-      .toolbar,
       .formula-bar,
+      .toolbar,
       .mobile-preview,
       .view-hint,
       .app-version,
@@ -1188,94 +1184,33 @@
       .update-success-toast {
         display: none !important;
         visibility: hidden !important;
+        height: 0 !important;
+        min-height: 0 !important;
+        max-height: 0 !important;
+        overflow: hidden !important;
+      }
+
+      body > :not(#printReport) {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        overflow: hidden !important;
       }
 
       #printReport {
         display: block !important;
         visibility: visible !important;
         width: 198mm !important;
-        height: 285mm !important;
+        max-width: 198mm !important;
         margin: 0 auto !important;
-        padding: 0 !important;
-        overflow: hidden !important;
-        page-break-inside: avoid !important;
         page-break-after: avoid !important;
-      }
-
-      #printReport * {
-        visibility: visible !important;
-        box-sizing: border-box !important;
+        page-break-inside: avoid !important;
       }
 
       #printReport .pr-page {
         width: 198mm !important;
-        height: 285mm !important;
         min-height: 0 !important;
-        margin: 0 auto !important;
-        padding: 0 !important;
-        display: flex !important;
-        flex-direction: column !important;
         overflow: hidden !important;
-        page-break-inside: avoid !important;
-      }
-
-      #printReport .pr-header {
-        flex: 0 0 auto !important;
-        padding: 5mm !important;
-        margin: 0 0 4mm 0 !important;
-      }
-
-      #printReport .pr-grid {
-        flex: 1 1 auto !important;
-        display: grid !important;
-        grid-template-columns: 1fr 1fr !important;
-        gap: 3.5mm !important;
-        margin-top: 0 !important;
-        overflow: hidden !important;
-      }
-
-      #printReport .pr-card {
-        padding: 3.5mm !important;
-        border-radius: 4mm !important;
-        page-break-inside: avoid !important;
-      }
-
-      #printReport .pr-card h3 {
-        margin: 0 0 2.4mm 0 !important;
-        font-size: 11pt !important;
-      }
-
-      #printReport .pr-row {
-        font-size: 9.4pt !important;
-        padding: 0.75mm 0 !important;
-      }
-
-      #printReport .pr-summary-grid {
-        gap: 2.5mm !important;
-      }
-
-      #printReport .pr-summary-box {
-        padding: 2.6mm !important;
-      }
-
-      #printReport .pr-summary-box .value {
-        font-size: 14.5pt !important;
-      }
-
-      #printReport .pr-final {
-        flex: 0 0 auto !important;
-        margin-top: 4mm !important;
-        padding: 5mm !important;
-      }
-
-      #printReport .pr-final-value {
-        font-size: 28pt !important;
-      }
-
-      #printReport .pr-footer {
-        flex: 0 0 auto !important;
-        margin-top: 3mm !important;
-        font-size: 8pt !important;
       }
     }
   </style>
@@ -1379,7 +1314,7 @@
     </div>
     <div class="toolbar">
       <div class="note"></div>
-      <button type="button" onclick="window.print()">Drukuj / zapisz PDF</button>
+      <button type="button" onclick="printReportOnly()">Drukuj / zapisz PDF</button>
       <button type="button" id="exitAppBtnPreview" class="exit-btn">Koniec</button>
 </div>
 
@@ -1560,7 +1495,7 @@
     </div>
   </section>
 
-  <div class="app-version" id="appVersion">ORLEN1023</div>
+  <div class="app-version" id="appVersion">ORLEN1024</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -1569,7 +1504,7 @@
   <div class="update-success-toast" id="updateSuccessToast">Uaktualniono do najnowszej wersji</div>
 
   <script>
-    const APP_VERSION = "ORLEN1023";
+    const APP_VERSION = "ORLEN1024";
 
     function normText(s) {
       return (s ?? "").toString().trim();
@@ -2004,6 +1939,339 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
       updatePrintReport();
       setInterval(updatePrintReport, 500);
     });
+
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function buildPrintReportHtml() {
+      updatePrintReport();
+
+      const report = document.getElementById("printReport");
+      const reportInner = report ? report.innerHTML : "";
+
+      const printCss = `
+        @page { size: A4 portrait; margin: 7mm; }
+        html, body {
+          margin: 0;
+          padding: 0;
+          background: #ffffff;
+          font-family: Arial, Helvetica, sans-serif;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+        * { box-sizing: border-box; }
+
+        .print-shell {
+          width: 196mm;
+          margin: 0 auto;
+        }
+
+        .orlen-mark {
+          position: relative;
+          width: 12mm;
+          height: 12mm;
+          border-radius: 3.5mm;
+          background: #e1261c;
+          flex: 0 0 12mm;
+          box-shadow: 0 2mm 5mm rgba(0,0,0,.08);
+          overflow: hidden;
+        }
+        .orlen-mark::before {
+          content: "";
+          position: absolute;
+          left: 1.3mm;
+          top: 2.2mm;
+          width: 7mm;
+          height: 2.6mm;
+          background: #ffffff;
+          border-radius: 2mm 3mm 1.2mm 1.2mm;
+          transform: rotate(-8deg);
+        }
+        .orlen-mark::after {
+          content: "";
+          position: absolute;
+          right: 1.3mm;
+          bottom: 1.4mm;
+          width: 4.2mm;
+          height: 4.2mm;
+          border: 1.4mm solid #ffffff;
+          border-top-color: transparent;
+          border-left-color: transparent;
+          border-radius: 50%;
+          transform: rotate(28deg);
+        }
+
+        #printReport {
+          display: block !important;
+          width: 100%;
+        }
+
+        #printReport .pr-page {
+          width: 100%;
+          color: #0b2d52;
+        }
+
+        #printReport .pr-header {
+          display: grid;
+          grid-template-columns: 1.15fr 1fr 0.88fr;
+          align-items: center;
+          gap: 4mm;
+          background: linear-gradient(135deg, #0b2d52 0%, #1f5c93 100%);
+          color: #ffffff;
+          border-radius: 4.5mm;
+          padding: 4.2mm;
+          box-shadow: 0 2mm 6mm rgba(11,45,82,.10);
+        }
+
+        #printReport .pr-brand {
+          display: flex;
+          align-items: center;
+          gap: 3.2mm;
+        }
+
+        #printReport .pr-brand .orlen-mark {
+          box-shadow: none;
+        }
+
+        #printReport .pr-brand-title {
+          font-size: 17pt;
+          font-weight: 900;
+          line-height: 1;
+          letter-spacing: .3px;
+        }
+
+        #printReport .pr-brand-title .gaz {
+          display: inline-block;
+          margin-left: 2mm;
+          padding: 1mm 2.2mm;
+          border-radius: 4mm;
+          font-size: 10pt;
+          background: rgba(255,255,255,.18);
+          border: 1px solid rgba(255,255,255,.22);
+        }
+
+        #printReport .pr-brand-sub {
+          margin-top: 1.5mm;
+          font-size: 8.5pt;
+          color: rgba(255,255,255,.90);
+        }
+
+        #printReport .pr-period-box {
+          text-align: center;
+          background: rgba(255,255,255,.10);
+          border: 1px solid rgba(255,255,255,.18);
+          border-radius: 3.6mm;
+          padding: 2.4mm;
+        }
+
+        #printReport .pr-period-label {
+          font-size: 8.2pt;
+          letter-spacing: .4px;
+          text-transform: uppercase;
+          opacity: .92;
+          margin-bottom: 1mm;
+        }
+
+        #printReport .pr-period-value {
+          font-size: 18pt;
+          font-weight: 900;
+          line-height: 1.1;
+        }
+
+        #printReport .pr-period-dates {
+          margin-top: 1.1mm;
+          font-size: 8.5pt;
+          opacity: .95;
+        }
+
+        #printReport .pr-logo-box {
+          display: flex;
+          justify-content: flex-end;
+        }
+
+        #printReport .pr-logo-box .brand-side-logo {
+          width: 42mm;
+          height: 18mm;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: #ffffff;
+          border-radius: 3.4mm;
+          padding: 2mm;
+          box-shadow: none;
+        }
+
+        #printReport .pr-logo-box .brand-side-logo img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          display: block;
+        }
+
+        #printReport .pr-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 3mm;
+          margin-top: 3mm;
+        }
+
+        #printReport .pr-card {
+          background: #ffffff;
+          border: 1px solid #d7e5f3;
+          border-radius: 3.5mm;
+          padding: 3mm;
+          box-shadow: 0 1.4mm 3.5mm rgba(11,45,82,.05);
+          page-break-inside: avoid;
+        }
+
+        #printReport .pr-card h3 {
+          margin: 0 0 2.1mm 0;
+          font-size: 10.8pt;
+          color: #123d6b;
+          padding-bottom: 1.6mm;
+          border-bottom: 1px solid #dce9f5;
+        }
+
+        #printReport .pr-rows {
+          display: grid;
+          gap: 1mm;
+        }
+
+        #printReport .pr-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: baseline;
+          gap: 3mm;
+          font-size: 9pt;
+          padding: .65mm 0;
+          border-bottom: 1px dashed #e4eef7;
+        }
+
+        #printReport .pr-row:last-child {
+          border-bottom: 0;
+        }
+
+        #printReport .pr-row span:first-child {
+          color: #4c6480;
+          font-weight: 600;
+        }
+
+        #printReport .pr-row span:last-child {
+          color: #0b2d52;
+          font-weight: 800;
+          text-align: right;
+        }
+
+        #printReport .pr-summary {
+          grid-column: 1 / -1;
+          background: linear-gradient(180deg, #f6fbff 0%, #eef6fd 100%);
+        }
+
+        #printReport .pr-summary-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 2.4mm;
+          margin-top: .8mm;
+        }
+
+        #printReport .pr-summary-box {
+          border-radius: 3mm;
+          padding: 2.8mm;
+          background: #ffffff;
+          border: 1px solid #dbe8f4;
+          text-align: center;
+        }
+
+        #printReport .pr-summary-box .label {
+          font-size: 8.2pt;
+          color: #56708e;
+          text-transform: uppercase;
+          margin-bottom: 1.1mm;
+          font-weight: 700;
+        }
+
+        #printReport .pr-summary-box .value {
+          font-size: 14.2pt;
+          color: #0b2d52;
+          font-weight: 900;
+        }
+
+        #printReport .pr-final {
+          margin-top: 3mm;
+          background: linear-gradient(135deg, #0b2d52 0%, #1f5c93 100%);
+          color: #ffffff;
+          border-radius: 4.5mm;
+          padding: 4mm;
+          text-align: center;
+          box-shadow: 0 2mm 6mm rgba(11,45,82,.12);
+        }
+
+        #printReport .pr-final-label {
+          font-size: 10pt;
+          text-transform: uppercase;
+          letter-spacing: .4px;
+          margin-bottom: 1.6mm;
+          opacity: .96;
+          font-weight: 700;
+        }
+
+        #printReport .pr-final-value {
+          font-size: 27pt;
+          font-weight: 900;
+          line-height: 1;
+        }
+
+        #printReport .pr-footer {
+          margin-top: 3mm;
+          display: flex;
+          justify-content: space-between;
+          color: #56708e;
+          font-size: 7.8pt;
+          padding: 0 1mm;
+        }
+      `;
+
+      return `<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Raport ORLEN GAZ</title>
+<style>${printCss}</style>
+</head>
+<body>
+  <div class="print-shell">
+    <section id="printReport">${reportInner}</section>
+  </div>
+  <script>
+    window.onload = function() {
+      setTimeout(function() {
+        window.focus();
+        window.print();
+      }, 250);
+    };
+  <\/script>
+</body>
+</html>`;
+    }
+
+    function printReportOnly() {
+      updatePrintReport();
+      const win = window.open("", "_blank", "noopener,noreferrer,width=1000,height=1400");
+      if (!win) {
+        alert("Przeglądarka zablokowała okno wydruku. Zezwól na wyskakujące okna i spróbuj ponownie.");
+        return;
+      }
+      win.document.open();
+      win.document.write(buildPrintReportHtml());
+      win.document.close();
+    }
 
 </script>
 </body>
