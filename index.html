@@ -1584,7 +1584,7 @@
     </div>
   </section>
 
-  <div class="app-version" id="appVersion">ORLEN1032</div>
+  <div class="app-version" id="appVersion">ORLEN1033</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -1593,7 +1593,7 @@
   <div class="update-success-toast" id="updateSuccessToast">Uaktualniono do najnowszej wersji</div>
 
   <script>
-    const APP_VERSION = "ORLEN1032";
+    const APP_VERSION = "ORLEN1033";
 
     function normText(s) {
       return (s ?? "").toString().trim();
@@ -2357,11 +2357,180 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
     }
 
 
+
+    function pdfHexString(value) {
+      const text = String(value ?? "");
+      let hex = "FEFF";
+      for (let i = 0; i < text.length; i++) {
+        const code = text.charCodeAt(i);
+        hex += code.toString(16).padStart(4, "0").toUpperCase();
+      }
+      return "<" + hex + ">";
+    }
+
+    function pdfNumber(value) {
+      return Number(value).toFixed(2).replace(/\.00$/, "");
+    }
+
+    function makePdfTextLine(x, y, text, size = 10, bold = false) {
+      return `BT /${bold ? "F2" : "F1"} ${size} Tf ${pdfNumber(x)} ${pdfNumber(y)} Td ${pdfHexString(text)} Tj ET\n`;
+    }
+
+    function makePdfRect(x, y, w, h, fill = "0.94 0.97 1 rg") {
+      return `q ${fill} ${pdfNumber(x)} ${pdfNumber(y)} ${pdfNumber(w)} ${pdfNumber(h)} re f Q\n`;
+    }
+
+    function buildMonthlyPdfBlob() {
+      updatePrintReport();
+
+      const month = getRaw("F1") || "MIESIĄC";
+      const year = getRaw("F2") || "";
+      const lines = [];
+
+      // Header
+      lines.push(makePdfRect(35, 760, 525, 52, "0.04 0.18 0.32 rg"));
+      lines.push(makePdfTextLine(55, 790, "ORLEN GAZ", 20, true));
+      lines.push(makePdfTextLine(238, 790, `${month} ${year}`, 18, true));
+      lines.push(makePdfTextLine(410, 790, "PGNiG GRUPA ORLEN", 13, true));
+      lines.push(makePdfTextLine(55, 772, "Raport rozliczenia zużycia gazu", 8, false));
+
+      // Period
+      lines.push(makePdfRect(35, 700, 525, 42, "0.90 0.95 1 rg"));
+      lines.push(makePdfTextLine(52, 725, "Okres rozliczenia", 13, true));
+      lines.push(makePdfTextLine(52, 707, `Od: ${getRaw("D4")}     Do: ${getRaw("E4")}`, 12, true));
+
+      const cards = [
+        {
+          x: 35, y: 565, w: 250, h: 115, title: "Parametry rozliczenia",
+          rows: [
+            ["Współczynnik", getRaw("J5")],
+            ["Stawka paliwa", getRaw("L5")],
+            ["Stawka zmienna", getRaw("L7")],
+            ["Stawka stała", getRaw("L6")],
+            ["Opłata abonamentowa", getRaw("L4")]
+          ]
+        },
+        {
+          x: 310, y: 565, w: 250, h: 115, title: "Paliwo gazowe",
+          rows: [
+            ["Stan początkowy", getRaw("F5")],
+            ["Stan końcowy", getRaw("G5")],
+            ["Zużycie", getRaw("H5")],
+            ["Energia", getRaw("K5")],
+            ["Kwota", getRaw("M5")]
+          ]
+        },
+        {
+          x: 35, y: 430, w: 250, h: 115, title: "Dystrybucja",
+          rows: [
+            ["Stała", getRaw("M6")],
+            ["Zmienna", getRaw("M7")],
+            ["Abonament", getRaw("M4")]
+          ]
+        },
+        {
+          x: 310, y: 430, w: 250, h: 115, title: "Licznik góra",
+          rows: [
+            ["Stan początkowy", getRaw("F8")],
+            ["Stan końcowy", getRaw("G8")],
+            ["Zużycie", getRaw("H8")],
+            ["Cena za jednostkę", getRaw("I8")],
+            ["Kwota", getRaw("M8")]
+          ]
+        },
+        {
+          x: 35, y: 295, w: 250, h: 115, title: "Licznik dół",
+          rows: [
+            ["Zużycie", getRaw("H9")],
+            ["Cena za jednostkę", getRaw("I9")],
+            ["Kwota", getRaw("M9")]
+          ]
+        }
+      ];
+
+      cards.forEach(card => {
+        lines.push(makePdfRect(card.x, card.y, card.w, card.h, "0.98 0.99 1 rg"));
+        lines.push(makePdfRect(card.x, card.y + card.h - 24, card.w, 24, "0.09 0.67 0.93 rg"));
+        lines.push(makePdfTextLine(card.x + 12, card.y + card.h - 17, card.title, 11, true));
+        let rowY = card.y + card.h - 43;
+        card.rows.forEach(([label, value]) => {
+          lines.push(makePdfTextLine(card.x + 12, rowY, label, 9, false));
+          lines.push(makePdfTextLine(card.x + card.w - 85, rowY, value, 9, true));
+          rowY -= 17;
+        });
+      });
+
+      // Summary
+      lines.push(makePdfRect(35, 205, 525, 64, "0.93 0.97 1 rg"));
+      lines.push(makePdfRect(35, 245, 525, 24, "0.09 0.67 0.93 rg"));
+      lines.push(makePdfTextLine(48, 253, "Podsumowanie", 11, true));
+      lines.push(makePdfTextLine(80, 223, `Wartość: ${getRaw("K12")}`, 13, true));
+      lines.push(makePdfTextLine(245, 223, `VAT: ${getRaw("L12")}`, 13, true));
+      lines.push(makePdfTextLine(390, 223, `Brutto: ${getRaw("M12")}`, 13, true));
+
+      // Final
+      lines.push(makePdfRect(35, 120, 525, 58, "0.04 0.18 0.32 rg"));
+      lines.push(makePdfTextLine(160, 155, "DO ZAPŁATY — LICZNIK DÓŁ ZA MIESIĄC", 12, true));
+      lines.push(makePdfTextLine(255, 132, getRaw("M9"), 24, true));
+
+      lines.push(makePdfTextLine(35, 88, "ORLEN Gaz — raport do druku", 8, false));
+      lines.push(makePdfTextLine(425, 88, new Date().toLocaleString("pl-PL"), 8, false));
+
+      const content = lines.join("");
+      const objects = [
+        "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n",
+        "2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n",
+        "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >>\nendobj\n",
+        "4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n",
+        "5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>\nendobj\n",
+        `6 0 obj\n<< /Length ${content.length} >>\nstream\n${content}\nendstream\nendobj\n`
+      ];
+
+      let pdf = "%PDF-1.4\n";
+      const offsets = [0];
+      objects.forEach(obj => {
+        offsets.push(pdf.length);
+        pdf += obj;
+      });
+
+      const xrefStart = pdf.length;
+      pdf += `xref\n0 ${objects.length + 1}\n`;
+      pdf += "0000000000 65535 f \n";
+      for (let i = 1; i < offsets.length; i++) {
+        pdf += String(offsets[i]).padStart(10, "0") + " 00000 n \n";
+      }
+      pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefStart}\n%%EOF`;
+
+      return new Blob([pdf], { type: "application/pdf" });
+    }
+
+    function downloadMonthlyPdfReport() {
+      const month = (getRaw("F1") || "MIESIĄC").replace(/\s+/g, "-");
+      const year = (getRaw("F2") || "").replace(/\s+/g, "-");
+      const safeName = (`Rachunek-${month}-${year}.pdf`)
+        .replace(/[\\/:*?"<>|]/g, "-")
+        .replace(/--+/g, "-");
+
+      const blob = buildMonthlyPdfBlob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = safeName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      window.setTimeout(() => URL.revokeObjectURL(url), 2000);
+    }
+
+
     function prepareAndPrintReport() {
       updatePrintReport();
+      downloadMonthlyPdfReport();
       window.setTimeout(() => {
         window.print();
-      }, 150);
+      }, 250);
+    }, 150);
     }
 
 
