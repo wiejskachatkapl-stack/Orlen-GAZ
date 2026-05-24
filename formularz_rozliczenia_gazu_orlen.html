@@ -1155,47 +1155,127 @@
 
 
     
+    
     @page {
       size: A4 portrait;
-      margin: 7mm;
+      margin: 6mm;
     }
 
     @media print {
-      html, body {
+      html,
+      body {
         margin: 0 !important;
         padding: 0 !important;
         background: #ffffff !important;
-        overflow: visible !important;
+        overflow: hidden !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
 
-      body * {
-        box-sizing: border-box !important;
+      body > *:not(#printReport) {
+        display: none !important;
       }
 
       .wrap,
+      #entryPanel,
+      #previewArea,
+      .toolbar,
+      .formula-bar,
+      .mobile-preview,
+      .view-hint,
       .app-version,
       .update-toast,
       .update-success-toast {
         display: none !important;
+        visibility: hidden !important;
       }
 
       #printReport {
         display: block !important;
+        visibility: visible !important;
+        width: 198mm !important;
+        height: 285mm !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+        page-break-inside: avoid !important;
+        page-break-after: avoid !important;
+      }
+
+      #printReport * {
+        visibility: visible !important;
+        box-sizing: border-box !important;
       }
 
       #printReport .pr-page {
-        width: 196mm;
-        min-height: 279mm;
-        margin: 0 auto;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
+        width: 198mm !important;
+        height: 285mm !important;
+        min-height: 0 !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
+        page-break-inside: avoid !important;
+      }
+
+      #printReport .pr-header {
+        flex: 0 0 auto !important;
+        padding: 5mm !important;
+        margin: 0 0 4mm 0 !important;
       }
 
       #printReport .pr-grid {
-        flex: 1 1 auto;
+        flex: 1 1 auto !important;
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 3.5mm !important;
+        margin-top: 0 !important;
+        overflow: hidden !important;
+      }
+
+      #printReport .pr-card {
+        padding: 3.5mm !important;
+        border-radius: 4mm !important;
+        page-break-inside: avoid !important;
+      }
+
+      #printReport .pr-card h3 {
+        margin: 0 0 2.4mm 0 !important;
+        font-size: 11pt !important;
+      }
+
+      #printReport .pr-row {
+        font-size: 9.4pt !important;
+        padding: 0.75mm 0 !important;
+      }
+
+      #printReport .pr-summary-grid {
+        gap: 2.5mm !important;
+      }
+
+      #printReport .pr-summary-box {
+        padding: 2.6mm !important;
+      }
+
+      #printReport .pr-summary-box .value {
+        font-size: 14.5pt !important;
+      }
+
+      #printReport .pr-final {
+        flex: 0 0 auto !important;
+        margin-top: 4mm !important;
+        padding: 5mm !important;
+      }
+
+      #printReport .pr-final-value {
+        font-size: 28pt !important;
+      }
+
+      #printReport .pr-footer {
+        flex: 0 0 auto !important;
+        margin-top: 3mm !important;
+        font-size: 8pt !important;
       }
     }
   </style>
@@ -1480,7 +1560,7 @@
     </div>
   </section>
 
-  <div class="app-version" id="appVersion">ORLEN1022</div>
+  <div class="app-version" id="appVersion">ORLEN1023</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -1489,7 +1569,7 @@
   <div class="update-success-toast" id="updateSuccessToast">Uaktualniono do najnowszej wersji</div>
 
   <script>
-    const APP_VERSION = "ORLEN1022";
+    const APP_VERSION = "ORLEN1023";
 
     function normText(s) {
       return (s ?? "").toString().trim();
