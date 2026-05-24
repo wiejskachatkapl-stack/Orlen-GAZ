@@ -1492,7 +1492,7 @@
         </div>
       </div>
       <div class="form-actions">
-        <button type="button" id="addReadingBtn">Dodaj</button>
+        <button type="button" id="addReadingBtn" onclick="try{orlenDirectSave()}catch(e){}">Dodaj</button>
         <button type="button" id="changeRatesBtn">Zmień wartości</button>
                 <button type="button" id="exitAppBtn" class="exit-btn">Koniec</button>
 <span id="formError" class="error">Uzupełnij poprawnie wszystkie pola. Stan końcowy nie może być mniejszy od początkowego.</span>
@@ -1694,7 +1694,7 @@
     </div>
   </section>
 
-  <div class="app-version" id="appVersion">ORLEN1057</div>
+  <div class="app-version" id="appVersion">ORLEN1058</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -1703,7 +1703,7 @@
   <div class="update-success-toast" id="updateSuccessToast">Uaktualniono do najnowszej wersji</div>
 
   <script>
-    const APP_VERSION = "ORLEN1057";
+    const APP_VERSION = "ORLEN1058";
 
     function normText(s) {
       return (s ?? "").toString().trim();
@@ -2094,17 +2094,8 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
   
 
 
-
-    /*
-      ORLEN trwały zapis danych:
-      - zapisuje wartości po kliknięciu DODAJ
-      - wczytuje je natychmiast po starcie strony
-      - nadpisuje wartości wpisane na sztywno w HTML
-      - działa bez zmiany funkcji drukowania
-    */
-    const ORLEN_STORAGE_KEY_MAIN = "ORLEN_GAZ_TRWALY_ZAPIS_DANYCH";
-    const ORLEN_STORAGE_KEY_BACKUP = "ORLEN_GAZ_TRWALY_ZAPIS_DANYCH_BACKUP";
-    const ORLEN_INPUT_IDS = [
+    const ORLEN_DIRECT_SAVE_KEY = "ORLEN_GAZ_DIRECT_SAVE_V1";
+    const ORLEN_DIRECT_FIELDS = [
       "dateFrom",
       "dateTo",
       "mainFrom",
@@ -2118,20 +2109,48 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
       "rateSubscription"
     ];
 
-    function orlenGetInputsSnapshot() {
+    function orlenDirectCollect() {
       const data = {};
-      ORLEN_INPUT_IDS.forEach(id => {
+      ORLEN_DIRECT_FIELDS.forEach(id => {
         const el = document.getElementById(id);
         if (el) data[id] = el.value;
       });
       return data;
     }
 
-    function orlenSetInputsSnapshot(data) {
-      if (!data || typeof data !== "object") return false;
-      let applied = false;
+    function orlenDirectCookieSet(raw) {
+      try {
+        document.cookie = ORLEN_DIRECT_SAVE_KEY + "=" + encodeURIComponent(raw) + "; max-age=31536000; path=/; SameSite=Lax";
+      } catch (err) {}
+    }
 
-      ORLEN_INPUT_IDS.forEach(id => {
+    function orlenDirectCookieGet() {
+      try {
+        const parts = document.cookie.split(";").map(v => v.trim());
+        const found = parts.find(v => v.startsWith(ORLEN_DIRECT_SAVE_KEY + "="));
+        return found ? decodeURIComponent(found.substring(ORLEN_DIRECT_SAVE_KEY.length + 1)) : "";
+      } catch (err) {
+        return "";
+      }
+    }
+
+    function orlenDirectSave() {
+      const raw = JSON.stringify(orlenDirectCollect());
+      try {
+        localStorage.setItem(ORLEN_DIRECT_SAVE_KEY, raw);
+      } catch (err) {}
+      try {
+        sessionStorage.setItem(ORLEN_DIRECT_SAVE_KEY, raw);
+      } catch (err) {}
+      orlenDirectCookieSet(raw);
+      window.__ORLEN_DIRECT_LAST__ = raw;
+    }
+
+    function orlenDirectApply(data) {
+      if (!data || typeof data !== "object") return false;
+
+      let applied = false;
+      ORLEN_DIRECT_FIELDS.forEach(id => {
         const el = document.getElementById(id);
         if (el && Object.prototype.hasOwnProperty.call(data, id)) {
           el.value = data[id];
@@ -2143,53 +2162,31 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
       return applied;
     }
 
-    function orlenSavePermanent() {
-      const data = orlenGetInputsSnapshot();
-      const raw = JSON.stringify(data);
+    function orlenDirectLoad() {
+      let raw = "";
 
       try {
-        localStorage.setItem(ORLEN_STORAGE_KEY_MAIN, raw);
-        localStorage.setItem(ORLEN_STORAGE_KEY_BACKUP, raw);
+        raw = localStorage.getItem(ORLEN_DIRECT_SAVE_KEY) || "";
       } catch (err) {}
 
-      try {
-        sessionStorage.setItem(ORLEN_STORAGE_KEY_MAIN, raw);
-      } catch (err) {}
+      if (!raw) {
+        try {
+          raw = sessionStorage.getItem(ORLEN_DIRECT_SAVE_KEY) || "";
+        } catch (err) {}
+      }
+
+      if (!raw) raw = orlenDirectCookieGet();
+      if (!raw) return false;
 
       try {
-        document.cookie = ORLEN_STORAGE_KEY_MAIN + "=" + encodeURIComponent(raw) + "; max-age=31536000; path=/; SameSite=Lax";
-      } catch (err) {}
-
-      window.__ORLEN_LAST_VALUES__ = data;
-    }
-
-    function orlenReadCookiePermanent() {
-      try {
-        const parts = document.cookie.split(";").map(v => v.trim());
-        const found = parts.find(v => v.startsWith(ORLEN_STORAGE_KEY_MAIN + "="));
-        if (!found) return null;
-        return decodeURIComponent(found.substring(ORLEN_STORAGE_KEY_MAIN.length + 1));
+        const data = JSON.parse(raw);
+        return orlenDirectApply(data);
       } catch (err) {
-        return null;
+        return false;
       }
     }
 
-    function orlenLoadPermanentRaw() {
-      let raw = null;
-
-      try { raw = localStorage.getItem(ORLEN_STORAGE_KEY_MAIN); } catch (err) {}
-      if (!raw) {
-        try { raw = localStorage.getItem(ORLEN_STORAGE_KEY_BACKUP); } catch (err) {}
-      }
-      if (!raw) {
-        try { raw = sessionStorage.getItem(ORLEN_STORAGE_KEY_MAIN); } catch (err) {}
-      }
-      if (!raw) raw = orlenReadCookiePermanent();
-
-      return raw;
-    }
-
-    function orlenApplyToSheetFromInputs() {
+    function orlenDirectUpdateSheet() {
       if (typeof setCell !== "function") return;
 
       const dateFrom = document.getElementById("dateFrom")?.value || "";
@@ -2244,60 +2241,23 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
       if (typeof updatePrintReport === "function") updatePrintReport();
     }
 
-    function orlenLoadPermanent() {
-      const raw = orlenLoadPermanentRaw();
-      if (!raw) return false;
-
-      try {
-        const data = JSON.parse(raw);
-        const ok = orlenSetInputsSnapshot(data);
-        if (ok) {
-          window.__ORLEN_LAST_VALUES__ = data;
-          setTimeout(orlenApplyToSheetFromInputs, 0);
-          setTimeout(orlenApplyToSheetFromInputs, 200);
-          setTimeout(orlenApplyToSheetFromInputs, 800);
-        }
-        return ok;
-      } catch (err) {
-        return false;
+    function orlenDirectBoot() {
+      const loaded = orlenDirectLoad();
+      if (loaded) {
+        setTimeout(orlenDirectUpdateSheet, 0);
+        setTimeout(orlenDirectUpdateSheet, 200);
+        setTimeout(orlenDirectUpdateSheet, 700);
       }
     }
 
-    function orlenBindPermanentSave() {
-      const addBtn = document.getElementById("addReadingBtn");
-      if (addBtn && addBtn.dataset.orlenPermanentSave !== "1") {
-        addBtn.dataset.orlenPermanentSave = "1";
-        addBtn.addEventListener("click", orlenSavePermanent, true);
-      }
-
-      const updateRatesBtn = document.getElementById("updateRatesBtn");
-      if (updateRatesBtn && updateRatesBtn.dataset.orlenPermanentSave !== "1") {
-        updateRatesBtn.dataset.orlenPermanentSave = "1";
-        updateRatesBtn.addEventListener("click", orlenSavePermanent, true);
-      }
-
-      ORLEN_INPUT_IDS.forEach(id => {
-        const el = document.getElementById(id);
-        if (!el || el.dataset.orlenPermanentSave === "1") return;
-        el.dataset.orlenPermanentSave = "1";
-        el.addEventListener("input", () => {
-          window.__ORLEN_LAST_VALUES__ = orlenGetInputsSnapshot();
-        });
-        el.addEventListener("change", () => {
-          window.__ORLEN_LAST_VALUES__ = orlenGetInputsSnapshot();
-        });
-      });
-    }
-
-    function orlenBootPermanentSave() {
-      orlenLoadPermanent();
-      orlenBindPermanentSave();
-    }
+    window.orlenDirectSave = orlenDirectSave;
+    window.orlenDirectLoad = orlenDirectLoad;
+    window.orlenDirectBoot = orlenDirectBoot;
 
     if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", orlenBootPermanentSave);
+      document.addEventListener("DOMContentLoaded", orlenDirectBoot);
     } else {
-      orlenBootPermanentSave();
+      orlenDirectBoot();
     }
 
 
@@ -2359,7 +2319,7 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
     }
 
     window.addEventListener("load", () => {
-      if (typeof orlenInitLastInputsSave === "function") orlenInitLastInputsSave();
+      if (typeof orlenDirectBoot === "function") orlenDirectBoot();
       if (typeof updatePrintReport === "function") {
         updatePrintReport();
         setInterval(updatePrintReport, 500);
