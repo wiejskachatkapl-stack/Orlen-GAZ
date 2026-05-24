@@ -935,28 +935,20 @@
     
     
     
+    
     @page {
       size: A4 landscape;
-      margin: 4mm;
+      margin: 3mm;
     }
 
     @media print {
-      html,
-      body {
+      html, body {
         margin: 0 !important;
         padding: 0 !important;
-        width: 289mm !important;
-        min-width: 289mm !important;
-        max-width: 289mm !important;
-        height: 202mm !important;
         background: #ffffff !important;
-        overflow: hidden !important;
+        overflow: visible !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
-      }
-
-      body {
-        zoom: 1 !important;
       }
 
       * {
@@ -975,96 +967,81 @@
       }
 
       .wrap {
-        width: 289mm !important;
-        min-width: 289mm !important;
-        max-width: 289mm !important;
-        height: 202mm !important;
+        width: 100% !important;
+        max-width: none !important;
         margin: 0 !important;
         padding: 0 !important;
         border: 0 !important;
         border-radius: 0 !important;
         box-shadow: none !important;
         background: #ffffff !important;
-        overflow: hidden !important;
       }
 
       #previewArea {
         display: block !important;
-        width: 289mm !important;
-        height: 202mm !important;
+        width: 100% !important;
         margin: 0 !important;
         padding: 0 !important;
-        overflow: hidden !important;
-        page-break-before: avoid !important;
-        page-break-after: avoid !important;
+        overflow: visible !important;
         page-break-inside: avoid !important;
+        page-break-after: avoid !important;
       }
 
       .preview-shell {
-        width: 289mm !important;
-        height: 202mm !important;
+        width: 139% !important;
         margin: 0 !important;
         padding: 0 !important;
         border: 0 !important;
         border-radius: 0 !important;
-        box-shadow: none !important;
         background: #ffffff !important;
-        overflow: hidden !important;
-        transform: none !important;
+        box-shadow: none !important;
+        transform: scale(0.72) !important;
+        transform-origin: top left !important;
+        overflow: visible !important;
       }
 
       .brand-banner.preview {
-        width: 289mm !important;
-        min-height: 28mm !important;
-        height: 28mm !important;
-        margin: 0 0 3mm 0 !important;
-        padding: 4mm 6mm !important;
+        margin: 0 0 2mm 0 !important;
+        padding: 3mm 5mm !important;
+        min-height: 22mm !important;
+        height: 22mm !important;
         border-radius: 0 !important;
         box-shadow: none !important;
       }
 
       .orlen-mark {
-        width: 15mm !important;
-        height: 15mm !important;
-        min-width: 15mm !important;
-        border-radius: 4mm !important;
+        width: 13mm !important;
+        height: 13mm !important;
+        min-width: 13mm !important;
       }
 
       .brand-title {
-        font-size: 18pt !important;
+        font-size: 16pt !important;
       }
 
       .brand-title .gaz {
-        font-size: 12pt !important;
+        font-size: 11pt !important;
         padding: 1mm 2mm !important;
       }
 
       .brand-side-logo {
-        width: 45mm !important;
-        height: 18mm !important;
+        width: 42mm !important;
+        height: 17mm !important;
         padding: 2mm !important;
       }
 
-      .brand-side-logo img {
-        width: 100% !important;
-        height: 100% !important;
-        object-fit: contain !important;
-      }
-
       #previewArea .preview-period-title {
-        font-size: 18pt !important;
+        font-size: 16pt !important;
       }
 
       .sheet-frame {
-        width: 289mm !important;
-        height: 132mm !important;
         margin: 0 !important;
-        padding: 0 2mm !important;
+        padding: 0 !important;
         border: 0 !important;
         border-radius: 0 !important;
         box-shadow: none !important;
         background: #ffffff !important;
-        overflow: hidden !important;
+        overflow: visible !important;
       }
 
       .sheet-frame::before {
@@ -1072,27 +1049,46 @@
       }
 
       table.sheet {
-        width: 285mm !important;
-        max-width: 285mm !important;
+        width: 100% !important;
+        max-width: none !important;
         table-layout: fixed !important;
         border-collapse: separate !important;
-        border-spacing: 1.2mm !important;
+        border-spacing: 1mm !important;
         margin: 0 !important;
         padding: 0 !important;
-        box-shadow: none !important;
         background: transparent !important;
+        box-shadow: none !important;
+      }
+
+      table.sheet col:nth-child(1){ width:11.737% !important; }
+      table.sheet col:nth-child(2){ width:7.666% !important; }
+      table.sheet col:nth-child(3){ width:8.684% !important; }
+      table.sheet col:nth-child(4){ width:7.666% !important; }
+      table.sheet col:nth-child(5){ width:7.123% !important; }
+      table.sheet col:nth-child(6){ width:6.649% !important; }
+      table.sheet col:nth-child(7){ width:7.123% !important; }
+      table.sheet col:nth-child(8){ width:7.123% !important; }
+      table.sheet col:nth-child(9){ width:7.123% !important; }
+      table.sheet col:nth-child(10){ width:7.123% !important; }
+      table.sheet col:nth-child(11){ width:7.666% !important; }
+      table.sheet col:nth-child(12){ width:6.649% !important; }
+      table.sheet col:nth-child(13){ width:7.666% !important; }
+
+      .sheet tr.header-space,
+      #previewArea .spacer-row {
+        display: none !important;
       }
 
       .sheet td,
       .sheet th {
-        height: 8.2mm !important;
-        min-height: 8.2mm !important;
-        padding: 1mm 1mm !important;
-        font-size: 7.2pt !important;
+        height: 7.4mm !important;
+        min-height: 7.4mm !important;
+        padding: 0.8mm 0.8mm !important;
+        font-size: 6.8pt !important;
         line-height: 1 !important;
-        border-radius: 2mm !important;
         white-space: nowrap !important;
         overflow: hidden !important;
+        border-radius: 1.8mm !important;
       }
 
       .sheet td span {
@@ -1100,36 +1096,27 @@
         line-height: 1 !important;
       }
 
-      .sheet .header-space,
-      #previewArea .spacer-row {
-        display: none !important;
-      }
-
       .sheet td.left-label {
-        font-size: 9pt !important;
+        font-size: 8.6pt !important;
       }
 
       .sheet td.side-result,
       .sheet td.total-main {
-        font-size: 12pt !important;
+        font-size: 11pt !important;
       }
 
       .sheet td.pay-banner {
-        height: 8mm !important;
-        font-size: 9pt !important;
+        height: 7.4mm !important;
+        font-size: 8.2pt !important;
       }
 
-      .sheet td.pay-amount {
-        height: 14mm !important;
-        font-size: 18pt !important;
-      }
-
+      .sheet td.pay-amount,
       .sheet td.pay-amount span {
-        font-size: 18pt !important;
+        font-size: 17pt !important;
       }
 
       .pay-value-row td {
-        height: 13mm !important;
+        height: 11mm !important;
       }
     }
   </style>
@@ -1310,7 +1297,7 @@
     </section>
   </div>
 
-  <div class="app-version" id="appVersion">ORLEN1020</div>
+  <div class="app-version" id="appVersion">ORLEN1021</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -1319,7 +1306,7 @@
   <div class="update-success-toast" id="updateSuccessToast">Uaktualniono do najnowszej wersji</div>
 
   <script>
-    const APP_VERSION = "ORLEN1020";
+    const APP_VERSION = "ORLEN1021";
 
     function normText(s) {
       return (s ?? "").toString().trim();
