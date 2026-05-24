@@ -1505,7 +1505,7 @@
       </div>
       <div class="form-actions">
         <button type="button" id="addReadingBtn">Dodaj</button>
-        <button type="button" id="manualSaveBtn">Zapisz</button>
+        <button type="button" id="manualSaveBtn" onclick="return orlenSimpleSave();">Zapisz</button>
         <span id="manualSaveInfo" class="manual-save-info">Zapisano dane</span>
         <button type="button" id="changeRatesBtn">Zmień wartości</button>
                 <button type="button" id="exitAppBtn" class="exit-btn">Koniec</button>
@@ -1563,7 +1563,7 @@
     <div class="toolbar">
       <div class="note"></div>
       <button type="button" onclick="prepareAndPrintReport()">Drukuj / zapisz PDF</button>
-      <button type="button" id="manualSaveBtnPreview">Zapisz</button>
+      <button type="button" id="manualSaveBtnPreview" onclick="return orlenSimpleSave();">Zapisz</button>
       <span id="manualSaveInfoPreview" class="manual-save-info">Zapisano dane</span>
       <button type="button" id="exitAppBtnPreview" class="exit-btn">Koniec</button>
 </div>
@@ -1710,7 +1710,7 @@
     </div>
   </section>
 
-  <div class="app-version" id="appVersion">ORLEN1051</div>
+  <div class="app-version" id="appVersion">ORLEN1052</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -1719,7 +1719,7 @@
   <div class="update-success-toast" id="updateSuccessToast">Uaktualniono do najnowszej wersji</div>
 
   <script>
-    const APP_VERSION = "ORLEN1051";
+    const APP_VERSION = "ORLEN1052";
 
     function normText(s) {
       return (s ?? "").toString().trim();
@@ -2110,6 +2110,7 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
   
 
 
+
     const ORLEN_SIMPLE_SAVE_KEY = "ORLEN_GAZ_VALUES_PERMANENT";
     const ORLEN_SIMPLE_FIELDS = [
       "dateFrom",
@@ -2125,13 +2126,12 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
       "rateSubscription"
     ];
 
-    function orlenSimpleShowSaved() {
-      const info = document.getElementById("manualSaveInfo");
-      const infoPreview = document.getElementById("manualSaveInfoPreview");
-
-      [info, infoPreview].forEach(el => {
+    function orlenSimpleShowSaved(text) {
+      const ids = ["manualSaveInfo", "manualSaveInfoPreview"];
+      ids.forEach(id => {
+        const el = document.getElementById(id);
         if (!el) return;
-        el.textContent = "Zapisano dane";
+        el.textContent = text;
         el.style.display = "inline-block";
         window.setTimeout(() => {
           el.style.display = "none";
@@ -2149,28 +2149,19 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
 
       try {
         window.localStorage.setItem(ORLEN_SIMPLE_SAVE_KEY, JSON.stringify(data));
+        orlenSimpleShowSaved("Zapisano dane");
       } catch (err) {
-        console.warn("localStorage niedostępny", err);
+        orlenSimpleShowSaved("Nie zapisano");
       }
 
-      // Zapasowo zapis w adresie hash nie jest potrzebny do wczytywania,
-      // ale potwierdzenie ma działać zawsze.
-      orlenSimpleShowSaved();
       return false;
     }
 
     function orlenSimpleLoad() {
-      let raw = null;
-
       try {
-        raw = window.localStorage.getItem(ORLEN_SIMPLE_SAVE_KEY);
-      } catch (err) {
-        raw = null;
-      }
+        const raw = window.localStorage.getItem(ORLEN_SIMPLE_SAVE_KEY);
+        if (!raw) return;
 
-      if (!raw) return;
-
-      try {
         const data = JSON.parse(raw);
 
         ORLEN_SIMPLE_FIELDS.forEach(id => {
@@ -2184,20 +2175,13 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
       }
     }
 
-    function orlenSimpleInit() {
+    window.orlenSimpleSave = orlenSimpleSave;
+    window.orlenSimpleLoad = orlenSimpleLoad;
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", orlenSimpleLoad);
+    } else {
       orlenSimpleLoad();
-
-      const startBtn = document.getElementById("manualSaveBtn");
-      if (startBtn && startBtn.dataset.bound !== "1") {
-        startBtn.dataset.bound = "1";
-        startBtn.addEventListener("click", orlenSimpleSave);
-      }
-
-      const previewBtn = document.getElementById("manualSaveBtnPreview");
-      if (previewBtn && previewBtn.dataset.bound !== "1") {
-        previewBtn.dataset.bound = "1";
-        previewBtn.addEventListener("click", orlenSimpleSave);
-      }
     }
 
 
