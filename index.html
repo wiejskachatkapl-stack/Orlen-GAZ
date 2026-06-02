@@ -1333,6 +1333,20 @@
       }
     }
 
+
+    /* ORLEN1068: przy Licznik dół na fakturze zostaje tylko nazwa i kwota */
+    #printReport .inv-meter-grid .inv-meter-row:nth-child(2) {
+      grid-template-columns: 1.25fr 1.05fr !important;
+    }
+
+    #printReport .inv-meter-grid .inv-meter-row:nth-child(2) .inv-meter-cell:not(.amount) {
+      display: none !important;
+    }
+
+    #printReport .inv-meter-grid .inv-meter-row:nth-child(2) .inv-meter-cell.amount {
+      border-left: 0 !important;
+    }
+
     @page {
       size: A4 portrait;
       margin: 6mm;
@@ -1720,7 +1734,7 @@
     </div>
   </section>
 
-  <div class="app-version" id="appVersion">ORLEN1067</div>
+  <div class="app-version" id="appVersion">ORLEN1068</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -1729,7 +1743,7 @@
   <div class="update-success-toast" id="updateSuccessToast">Uaktualniono do najnowszej wersji</div>
 
   <script>
-    const APP_VERSION = "ORLEN1067";
+    const APP_VERSION = "ORLEN1068";
 
     function normText(s) {
       return (s ?? "").toString().trim();
