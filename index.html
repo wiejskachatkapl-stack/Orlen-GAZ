@@ -1312,6 +1312,27 @@
     }
 
 
+
+    #printReport .inv-meter-empty {
+      background: transparent !important;
+      border-left: 0 !important;
+    }
+
+
+    /* ORLEN1067: skalowanie CAŁEGO wypełnionego szablonu na ekranie do 67% */
+    @media screen {
+      #previewArea {
+        overflow: hidden;
+      }
+
+      #previewArea .preview-shell {
+        transform: scale(0.67);
+        transform-origin: top center;
+        width: 149.2537%;
+        margin-left: -24.62685%;
+      }
+    }
+
     @page {
       size: A4 portrait;
       margin: 6mm;
@@ -1447,7 +1468,16 @@
         font-size: 7pt !important;
       }
     }
-  </style>
+  
+    @media print {
+      #printReport .inv-page {
+        transform: none !important;
+        transform-origin: top left;
+        width: 100% !important;
+      }
+    }
+
+</style>
 </head>
 <body>
   <div class="wrap">
@@ -1673,11 +1703,7 @@
         </div>
         <div class="inv-meter-row">
           <div class="inv-meter-title"><strong>Licznik dół</strong><div class="inv-meter-dates"><span data-print="dateFrom">01.04.26</span><span data-print="dateTo">30.04.26</span></div></div>
-          <div class="inv-meter-cell"><div class="label">Stan początkowy</div><div class="value" data-print="bottomFrom">43665</div></div>
-          <div class="inv-meter-cell"><div class="label">Stan końcowy</div><div class="value" data-print="bottomTo">43756</div></div>
-          <div class="inv-meter-cell"><div class="label">Różnica</div><div class="value" data-print="bottomUsage">91</div></div>
-          <div class="inv-meter-cell"><div class="label">Mnożnik</div><div class="value" data-print="bottomUnit">4,31</div></div>
-          <div class="inv-meter-cell amount"><div class="label">Zużycie / kwota</div><div class="value"><span data-print="bottomCost">391,77</span> PLN</div></div>
+          <div class="inv-meter-cell inv-meter-empty"></div><div class="inv-meter-cell inv-meter-empty"></div><div class="inv-meter-cell inv-meter-empty"></div><div class="inv-meter-cell inv-meter-empty"></div><div class="inv-meter-cell amount"><div class="label">Zużycie / kwota</div><div class="value"><span data-print="bottomCost">391,77</span> PLN</div></div>
         </div>
       </div>
 
@@ -1694,7 +1720,7 @@
     </div>
   </section>
 
-  <div class="app-version" id="appVersion">ORLEN1065</div>
+  <div class="app-version" id="appVersion">ORLEN1067</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -1703,7 +1729,7 @@
   <div class="update-success-toast" id="updateSuccessToast">Uaktualniono do najnowszej wersji</div>
 
   <script>
-    const APP_VERSION = "ORLEN1065";
+    const APP_VERSION = "ORLEN1067";
 
     function normText(s) {
       return (s ?? "").toString().trim();
