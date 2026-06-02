@@ -1332,22 +1332,7 @@
         margin-left: -24.62685%;
       }
     }
-
-
-    /* ORLEN1068: przy Licznik dół na fakturze zostaje tylko nazwa i kwota */
-    #printReport .inv-meter-grid .inv-meter-row:nth-child(2) {
-      grid-template-columns: 1.25fr 1.05fr !important;
-    }
-
-    #printReport .inv-meter-grid .inv-meter-row:nth-child(2) .inv-meter-cell:not(.amount) {
-      display: none !important;
-    }
-
-    #printReport .inv-meter-grid .inv-meter-row:nth-child(2) .inv-meter-cell.amount {
-      border-left: 0 !important;
-    }
-
-    @page {
+@page {
       size: A4 portrait;
       margin: 6mm;
     }
@@ -1717,7 +1702,7 @@
         </div>
         <div class="inv-meter-row">
           <div class="inv-meter-title"><strong>Licznik dół</strong><div class="inv-meter-dates"><span data-print="dateFrom">01.04.26</span><span data-print="dateTo">30.04.26</span></div></div>
-          <div class="inv-meter-cell inv-meter-empty"></div><div class="inv-meter-cell inv-meter-empty"></div><div class="inv-meter-cell inv-meter-empty"></div><div class="inv-meter-cell inv-meter-empty"></div><div class="inv-meter-cell amount"><div class="label">Zużycie / kwota</div><div class="value"><span data-print="bottomCost">391,77</span> PLN</div></div>
+          <div class="inv-meter-cell inv-meter-empty"></div><div class="inv-meter-cell inv-meter-empty"></div><div class="inv-meter-cell inv-meter-empty" data-bottom-usage=""></div><div class="inv-meter-cell inv-meter-empty" data-bottom-unit=""></div><div class="inv-meter-cell amount"><div class="label">Zużycie / kwota</div><div class="value"><span data-print="bottomCost">391,77</span> PLN</div></div>
         </div>
       </div>
 
@@ -1734,7 +1719,7 @@
     </div>
   </section>
 
-  <div class="app-version" id="appVersion">ORLEN1068</div>
+  <div class="app-version" id="appVersion">ORLEN1069</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -1743,7 +1728,7 @@
   <div class="update-success-toast" id="updateSuccessToast">Uaktualniono do najnowszej wersji</div>
 
   <script>
-    const APP_VERSION = "ORLEN1068";
+    const APP_VERSION = "ORLEN1069";
 
     function normText(s) {
       return (s ?? "").toString().trim();
@@ -2183,6 +2168,12 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
         finalPay: getRaw("M9"),
         generatedAt: new Date().toLocaleString("pl-PL")
       };
+
+
+        const bottomUsageCell = document.querySelector('#printReport .inv-meter-grid .inv-meter-row:nth-child(2) .inv-meter-cell.inv-meter-empty:nth-of-type(4)');
+        if (bottomUsageCell) bottomUsageCell.setAttribute('data-bottom-usage', values.bottomUsage || '');
+        const bottomUnitCell = document.querySelector('#printReport .inv-meter-grid .inv-meter-row:nth-child(2) .inv-meter-cell.inv-meter-empty:nth-of-type(5)');
+        if (bottomUnitCell) bottomUnitCell.setAttribute('data-bottom-unit', values.bottomUnit || '');
 
       Object.entries(values).forEach(([key, value]) => {
         document.querySelectorAll('[data-print="' + key + '"]').forEach(el => {
