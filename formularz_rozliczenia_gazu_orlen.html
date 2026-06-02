@@ -1700,9 +1700,11 @@
           <div class="inv-meter-cell"><div class="label">Mnożnik</div><div class="value" data-print="topUnit">4,31</div></div>
           <div class="inv-meter-cell amount"><div class="label">Zużycie / kwota</div><div class="value"><span data-print="topCost">254,00</span> PLN</div></div>
         </div>
-        <div class="inv-meter-row">
-          <div class="inv-meter-title"><strong>Licznik dół</strong><div class="inv-meter-dates"><span data-print="dateFrom">01.04.26</span><span data-print="dateTo">30.04.26</span></div></div>
-          <div class="inv-meter-cell inv-meter-empty"></div><div class="inv-meter-cell inv-meter-empty"></div><div class="inv-meter-cell inv-meter-empty" data-bottom-usage=""></div><div class="inv-meter-cell inv-meter-empty" data-bottom-unit=""></div><div class="inv-meter-cell amount"><div class="label">Zużycie / kwota</div><div class="value"><span data-print="bottomCost">391,77</span> PLN</div></div>
+        <div class="inv-meter-row inv-meter-row-bottom">
+          <div class="inv-meter-title"><strong>Licznik dół</strong><div class="dates"><span data-print="dateFrom"></span><span data-print="dateTo"></span></div></div>
+          <div class="inv-meter-cell"><div class="label">Różnica</div><div class="value" data-print="bottomUsage"></div></div>
+          <div class="inv-meter-cell"><div class="label">Mnożnik</div><div class="value" data-print="bottomUnit"></div></div>
+          <div class="inv-meter-cell amount"><div class="label">Zużycie / kwota</div><div class="value"><span data-print="bottomCost"></span> PLN</div></div>
         </div>
       </div>
 
@@ -1719,7 +1721,7 @@
     </div>
   </section>
 
-  <div class="app-version" id="appVersion">ORLEN1069</div>
+  <div class="app-version" id="appVersion">ORLEN1070</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -1728,7 +1730,7 @@
   <div class="update-success-toast" id="updateSuccessToast">Uaktualniono do najnowszej wersji</div>
 
   <script>
-    const APP_VERSION = "ORLEN1069";
+    const APP_VERSION = "ORLEN1070";
 
     function normText(s) {
       return (s ?? "").toString().trim();
