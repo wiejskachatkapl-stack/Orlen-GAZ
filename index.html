@@ -1073,7 +1073,7 @@
 
     #printReport .inv-info-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(6, minmax(0, 1fr));
       gap: 2.2mm;
       margin-bottom: 3mm;
     }
@@ -1680,6 +1680,8 @@
         <div class="inv-info-box"><div class="inv-info-label">Grupa taryfowa</div><div class="inv-info-value">W-3.12T / W-3.6WA</div></div>
         <div class="inv-info-box"><div class="inv-info-label">Paliwo gazowe</div><div class="inv-info-value">G1</div></div>
         <div class="inv-info-box"><div class="inv-info-label">Jednostka rozliczeniowa</div><div class="inv-info-value">1 mc</div></div>
+        <div class="inv-info-box"><div class="inv-info-label">Licznik początkowy główny</div><div class="inv-info-value"><span data-print="mainFrom"></span></div></div>
+        <div class="inv-info-box"><div class="inv-info-label">Licznik końcowy główny</div><div class="inv-info-value"><span data-print="mainTo"></span></div></div>
         <div class="inv-info-box"><div class="inv-info-label">Suma wykorzystanych metrów sześciennych gazu</div><div class="inv-info-value"><span data-print="totalUsage">150</span> m³</div></div>
       </div>
 
@@ -1721,7 +1723,7 @@
     </div>
   </section>
 
-  <div class="app-version" id="appVersion">ORLEN1070</div>
+  <div class="app-version" id="appVersion">ORLEN1071</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -1730,7 +1732,7 @@
   <div class="update-success-toast" id="updateSuccessToast">Uaktualniono do najnowszej wersji</div>
 
   <script>
-    const APP_VERSION = "ORLEN1070";
+    const APP_VERSION = "ORLEN1071";
 
     function normText(s) {
       return (s ?? "").toString().trim();
