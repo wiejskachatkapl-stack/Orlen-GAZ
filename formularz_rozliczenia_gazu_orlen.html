@@ -1478,7 +1478,7 @@
 
 </style>
 
-<style id="menu1072Styles">
+<style id="menu1073Styles">
 #startMenu,#historyPanel{position:fixed;inset:0;z-index:9990;background:linear-gradient(145deg,#f4f7f5,#e7efe9);display:flex;align-items:center;justify-content:center;padding:20px}
 .start-card,.history-card{width:min(620px,94vw);background:#fff;border-radius:24px;box-shadow:0 18px 55px #0002;padding:28px;text-align:center;border:1px solid #d8e2dc}
 .start-card h1,.history-card h1{margin:8px 0 24px;color:#174c2c}.start-logo{font-size:36px;font-weight:900;color:#d71920;margin-bottom:8px}.start-logo span{color:#168447}
@@ -1488,6 +1488,23 @@
 @media(max-width:600px){.start-card,.history-card{padding:20px}.start-logo{font-size:30px}.history-item{grid-template-columns:1fr}.history-item button{width:100%}}
 @media print{#startMenu,#historyPanel{display:none!important}}
 </style>
+
+<style id="blueNavyTheme1073">
+:root{--orange:#d9ebfb;--red:#123d6b;}
+#startMenu,#historyPanel{background:linear-gradient(145deg,#071b33 0%,#0b2d52 52%,#1f5c93 100%)!important;}
+.start-card,.history-card{background:linear-gradient(180deg,#f7fbff 0%,#e5f1fc 100%)!important;border:1px solid #7ea8cf!important;box-shadow:0 18px 55px rgba(0,20,50,.38)!important;}
+.start-card h1,.history-card h1,.history-item strong{color:#0b2d52!important;}
+.start-logo span{color:#1f5c93!important;}
+#startNewBtn,#startHistoryBtn,.history-item button,#addReadingBtn,#changeRatesBtn,#updateRatesBtn,#closeRatesBtn,#reloadUpdateBtn,#closeUpdateBtn,#backMenuPreview{background:linear-gradient(135deg,#0b2d52 0%,#1f5c93 100%)!important;color:#fff!important;}
+.history-item{background:#f4f9ff!important;border-color:#9eb9d8!important;}
+.history-item small,.history-empty{color:#425466!important;}
+/* Jedyny czerwony zestaw przycisków: anulowanie, cofnięcie i zakończenie */
+#startExitBtn,#cancelReadingBtn,#historyBackBtn,#exitAppBtn,#exitAppBtnPreview{background:linear-gradient(135deg,#8f1118 0%,#d32f2f 100%)!important;color:#fff!important;}
+/* Arkusz: usunięcie pomarańczowych/zielonych akcentów na rzecz palety niebiesko-granatowej */
+.sheet td.orange,.sheet .orange{background:linear-gradient(180deg,#d9ebfb 0%,#bddcf8 100%)!important;color:#08203b!important;}
+.sheet td.red,.sheet .red{color:#0b2d52!important;}
+</style>
+
 </head>
 <body>
 <div id="startMenu">
@@ -1751,7 +1768,7 @@
   <div class="update-success-toast" id="updateSuccessToast">Uaktualniono do najnowszej wersji</div>
 
   <script>
-    const APP_VERSION = "ORLEN1072";
+    const APP_VERSION = "ORLEN1073";
 
     function normText(s) {
       return (s ?? "").toString().trim();
