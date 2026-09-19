@@ -1723,7 +1723,7 @@
     </div>
   </section>
 
-  <div class="app-version" id="appVersion">ORLEN1071</div>
+  <div class="app-version" id="appVersion">ORLEN1072</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -1732,7 +1732,7 @@
   <div class="update-success-toast" id="updateSuccessToast">Uaktualniono do najnowszej wersji</div>
 
   <script>
-    const APP_VERSION = "ORLEN1071";
+    const APP_VERSION = "ORLEN1072";
 
     function normText(s) {
       return (s ?? "").toString().trim();
@@ -2059,6 +2059,48 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
       return Number(String(el.value).replace(",", "."));
     }
 
+    // Zapamiętywanie ostatnio wprowadzonych stanów liczników.
+    // Dane są przechowywane lokalnie na urządzeniu i przywracane po ponownym uruchomieniu aplikacji.
+    const LAST_METER_READINGS_KEY = "orlenGazLastMeterReadings";
+    const METER_READING_FIELDS = ["mainFrom", "mainTo", "topFrom", "topTo"];
+
+    function saveLastMeterReadings() {
+      const values = {};
+      METER_READING_FIELDS.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) values[id] = el.value;
+      });
+      try {
+        localStorage.setItem(LAST_METER_READINGS_KEY, JSON.stringify(values));
+      } catch (e) {
+        console.warn("Nie udało się zapisać stanów liczników.", e);
+      }
+    }
+
+    function restoreLastMeterReadings() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(LAST_METER_READINGS_KEY) || "null");
+        if (!saved) return;
+        METER_READING_FIELDS.forEach(id => {
+          const el = document.getElementById(id);
+          if (el && saved[id] !== undefined && saved[id] !== null && saved[id] !== "") {
+            el.value = saved[id];
+          }
+        });
+      } catch (e) {
+        console.warn("Nie udało się odtworzyć stanów liczników.", e);
+      }
+    }
+
+    restoreLastMeterReadings();
+    METER_READING_FIELDS.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener("input", saveLastMeterReadings);
+        el.addEventListener("change", saveLastMeterReadings);
+      }
+    });
+
     function applyEntryForm() {
       const dateFrom = document.getElementById("dateFrom").value;
       const dateTo = document.getElementById("dateTo").value;
@@ -2074,6 +2116,7 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
         return;
       }
       error.style.display = "none";
+      saveLastMeterReadings();
 
       const billingMonth = monthNameUpper(dateTo);
       setCell("F1", billingMonth);
