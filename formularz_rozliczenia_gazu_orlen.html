@@ -1723,7 +1723,7 @@
     </div>
   </section>
 
-  <div class="app-version" id="appVersion">ORLEN1072</div>
+  <div class="app-version" id="appVersion">ORLEN1071</div>
   <div class="update-toast" id="updateToast">
     Dostępna jest nowa wersja aplikacji.
     <button type="button" id="reloadUpdateBtn">Uaktualnij</button>
@@ -2059,46 +2059,42 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
       return Number(String(el.value).replace(",", "."));
     }
 
-    // Zapamiętywanie ostatnio wprowadzonych stanów liczników.
-    // Dane są przechowywane lokalnie na urządzeniu i przywracane po ponownym uruchomieniu aplikacji.
-    const LAST_METER_READINGS_KEY = "orlenGazLastMeterReadings";
-    const METER_READING_FIELDS = ["mainFrom", "mainTo", "topFrom", "topTo"];
+    // ORLEN1072: trwałe zapamiętywanie ostatnich stanów liczników.
+    const LAST_READINGS_KEY = "orlenGazLastReadingsV1";
+    const LAST_READING_IDS = ["mainFrom", "mainTo", "topFrom", "topTo"];
 
-    function saveLastMeterReadings() {
-      const values = {};
-      METER_READING_FIELDS.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) values[id] = el.value;
-      });
+    function saveLastReadings() {
       try {
-        localStorage.setItem(LAST_METER_READINGS_KEY, JSON.stringify(values));
-      } catch (e) {
-        console.warn("Nie udało się zapisać stanów liczników.", e);
-      }
+        const data = {};
+        LAST_READING_IDS.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) data[id] = el.value;
+        });
+        localStorage.setItem(LAST_READINGS_KEY, JSON.stringify(data));
+      } catch (e) {}
     }
 
-    function restoreLastMeterReadings() {
+    function restoreLastReadings() {
       try {
-        const saved = JSON.parse(localStorage.getItem(LAST_METER_READINGS_KEY) || "null");
-        if (!saved) return;
-        METER_READING_FIELDS.forEach(id => {
+        const raw = localStorage.getItem(LAST_READINGS_KEY);
+        if (!raw) return;
+        const data = JSON.parse(raw);
+        LAST_READING_IDS.forEach(id => {
           const el = document.getElementById(id);
-          if (el && saved[id] !== undefined && saved[id] !== null && saved[id] !== "") {
-            el.value = saved[id];
+          if (el && data[id] !== undefined && data[id] !== null && data[id] !== "") {
+            el.value = data[id];
           }
         });
-      } catch (e) {
-        console.warn("Nie udało się odtworzyć stanów liczników.", e);
-      }
+      } catch (e) {}
     }
 
-    restoreLastMeterReadings();
-    METER_READING_FIELDS.forEach(id => {
+    restoreLastReadings();
+    LAST_READING_IDS.forEach(id => {
       const el = document.getElementById(id);
-      if (el) {
-        el.addEventListener("input", saveLastMeterReadings);
-        el.addEventListener("change", saveLastMeterReadings);
-      }
+      if (!el) return;
+      el.addEventListener("input", saveLastReadings);
+      el.addEventListener("change", saveLastReadings);
+      el.addEventListener("blur", saveLastReadings);
     });
 
     function applyEntryForm() {
@@ -2116,7 +2112,7 @@ document.querySelectorAll('[data-preview-month]').forEach(el => {
         return;
       }
       error.style.display = "none";
-      saveLastMeterReadings();
+      saveLastReadings();
 
       const billingMonth = monthNameUpper(dateTo);
       setCell("F1", billingMonth);
